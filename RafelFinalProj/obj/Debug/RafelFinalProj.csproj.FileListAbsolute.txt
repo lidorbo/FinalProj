@@ -17,3 +17,21 @@ C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\
 C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csproj.GenerateResource.Cache
 C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.exe
 C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.pdb
+D:\Repo\FinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.exe.config
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.exe
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.pdb
+D:\Repo\FinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.exe
+D:\Repo\FinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.pdb
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csprojResolveAssemblyReference.cache
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RoundedButton.baml
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RoundedTextbox.baml
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\MainWindow.g.cs
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\App.g.cs
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\GeneratedInternalTypeHelper.g.cs
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj_MarkupCompile.cache
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj_MarkupCompile.lref
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\App.baml
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\MainWindow.baml
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.g.resources
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.Properties.Resources.resources
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csproj.GenerateResource.Cache
