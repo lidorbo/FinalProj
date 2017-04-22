@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RafelFinalProj"
         mc:Ignorable="d"      
-        Title="WireShark Analayzer" Height="689.135" Width="956" MinHeight="689.135" MinWidth="800">
+        Title="WireShark Analayzer" Height="689.135" Width="956" MinHeight="689.135" MinWidth="800" Icon="animals-shark-icon-2.png">
     <Window.Resources>
         <SolidColorBrush x:Key="brushWatermarkBackground" Color="White" />
         <SolidColorBrush x:Key="brushWatermarkForeground" Color="LightSteelBlue" />

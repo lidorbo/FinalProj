@@ -106,7 +106,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="animals-shark-icon-2.png" />
+    <Resource Include="animals-shark-icon-2.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

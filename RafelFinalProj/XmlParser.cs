@@ -68,7 +68,7 @@ namespace RafelFinalProj
                 }
                 else
                 {
-                    mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Field name " + elements[i].Name + "is invalid.");
+                    mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Field name " + elements[i].Name + " is invalid.");
                     return false;
                 }
             }
