@@ -1,40 +1,17 @@
-c:\users\lidor\documents\visual studio 2013\Projects\RafelFinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.exe.config
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.exe.config
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csprojResolveAssemblyReference.cache
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RoundedButton.baml
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RoundedTextbox.baml
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\App.g.cs
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\GeneratedInternalTypeHelper.g.cs
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj_MarkupCompile.cache
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj_MarkupCompile.lref
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.exe
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.pdb
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\App.baml
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.g.resources
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.Properties.Resources.resources
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csproj.GenerateResource.Cache
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.exe
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.pdb
 D:\Repo\FinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.exe.config
-D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.exe
-D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.pdb
 D:\Repo\FinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.exe
 D:\Repo\FinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.pdb
-D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csprojResolveAssemblyReference.cache
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RoundedButton.baml
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RoundedTextbox.baml
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\MainScreen.g.cs
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\App.g.cs
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\GeneratedInternalTypeHelper.g.cs
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj_MarkupCompile.cache
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj_MarkupCompile.lref
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\App.baml
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\MainScreen.baml
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.g.resources
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.Properties.Resources.resources
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csproj.GenerateResource.Cache
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\MainScreen.g.cs
-C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\MainScreen.baml
-<<<<<<< HEAD
-D:\Repo\FinalProj\RafelFinalProj\obj\Debug\MainScreen.g.cs
-D:\Repo\FinalProj\RafelFinalProj\obj\Debug\MainScreen.baml
-=======
->>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.exe
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.pdb

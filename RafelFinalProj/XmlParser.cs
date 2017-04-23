@@ -14,25 +14,18 @@ namespace RafelFinalProj
 
         MainScreen mainScreen;
         XmlDocument xmlFile;
-<<<<<<< HEAD
         Dictionary<string, int> xmlStructure;
         Dictionary<string, int> sizeOfTypes;
 
-=======
->>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
 
         public XmlParser(MainScreen mainScreen, XmlDocument xmlFile)
         {
             this.mainScreen = mainScreen;
             this.xmlFile = xmlFile;
-<<<<<<< HEAD
             xmlStructure = new Dictionary<string, int>();
             InitSizeOfDictionary();
             ParseXml();
 
-=======
-            IsValidXmlFormat();
->>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
         }
 
         /// <summary>
@@ -43,72 +36,55 @@ namespace RafelFinalProj
         /// </Message>
         /// </summary>
         /// <returns>true if the format is valid</returns>
-<<<<<<< HEAD
         private bool ParseXml()
         {
-           string fieldName = "";
-           string keyValue = "";
-           int typeSize = 0;
-           XmlElement root = xmlFile.DocumentElement;
-           XmlNodeList elements = root.ChildNodes;
-
-=======
-        private bool IsValidXmlFormat()
-        {
             string fieldName = "";
+            string keyValue = "";
+            int typeSize = 0;
             XmlElement root = xmlFile.DocumentElement;
             XmlNodeList elements = root.ChildNodes;
->>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
-           for (int i=0; i < elements.Count; i++)
-           {
+
+            for (int i = 0; i < elements.Count; i++)
+            {
                 fieldName = elements[i].Name.ToUpper();
                 if (fieldName.StartsWith(FIELD))
                 {
                     string checkDigits = fieldName.TrimStart(FIELD.ToCharArray());
                     if (i % 2 == 0)
                     {
-                            if (IsDigitsOnly(checkDigits))
-                            {
-                                mainScreen.sysNotificationsLV.Items.Add(fieldName + " " + elements[i].InnerText);
-<<<<<<< HEAD
-                                keyValue = elements[i].InnerText;
-                                xmlStructure.Add(keyValue, 0);
-=======
->>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
-                            }
-                            else
-                            {
-                                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Field name " + elements[i].Name + " should end with a number");
-                                return false;
-                            }
+                        if (IsDigitsOnly(checkDigits))
+                        {
+                            mainScreen.sysNotificationsLV.Items.Add(fieldName + " " + elements[i].InnerText);
+                            keyValue = elements[i].InnerText;
+                            xmlStructure.Add(keyValue, 0);
+                        }
+                        else
+                        {
+                            mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Field name " + elements[i].Name + " should end with a number");
+                            return false;
+                        }
                     }
                     else
                     {
-                            if (checkDigits[checkDigits.Length - 1] == 'S' && IsDigitsOnly(checkDigits.Substring(0, checkDigits.Length - 1)))
+                        if (checkDigits[checkDigits.Length - 1] == 'S' && IsDigitsOnly(checkDigits.Substring(0, checkDigits.Length - 1)))
+                        {
+                            mainScreen.sysNotificationsLV.Items.Add(fieldName + " " + elements[i].InnerText);
+                            typeSize = ConvertTypeToInt(elements[i].InnerText);
+                            if (typeSize == 0)
                             {
-                                mainScreen.sysNotificationsLV.Items.Add(fieldName + " " + elements[i].InnerText);
-<<<<<<< HEAD
-                                typeSize = ConvertTypeToInt(elements[i].InnerText);
-                                if(typeSize == 0)
-                                {
-                                    mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Invalid type " + elements[i].InnerText);
-                                    return false;
-                                }
-                                xmlStructure[keyValue] = typeSize;
-=======
->>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
-                            }
-                            else
-                            {
-                                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Field name " + elements[i].Name + " should have a number and S at the end");
+                                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Invalid type " + elements[i].InnerText);
                                 return false;
-                            }                      
-                    } 
-<<<<<<< HEAD
+                            }
+                            xmlStructure[keyValue] = typeSize;
+                        }
+                        else
+                        {
+                            mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Field name " + elements[i].Name + " should have a number and S at the end");
+                            return false;
+                        }
+                    }
 
-                    
-=======
->>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
+
                 }
                 else
                 {
@@ -116,32 +92,25 @@ namespace RafelFinalProj
                     return false;
                 }
             }
-<<<<<<< HEAD
 
-           string str = "";
-           foreach (var e in xmlStructure)
-           {
-               str += e.Key + " " + e.Value + "\n";
-           }
+            string str = "";
+            foreach (var e in xmlStructure)
+            {
+                str += e.Key + " " + e.Value + "\n";
+            }
 
-           mainScreen.sysNotificationsLV.Items.Add(str);
+            mainScreen.sysNotificationsLV.Items.Add(str);
 
-=======
->>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
-         
-          return true;
+
+            return true;
         }
 
-<<<<<<< HEAD
         /// <summary>
         ///  This method get a string and check if it contains only digits.
         /// </summary>
         /// <param name="str"></param>
         /// <returns>True if only digits</returns>
         private bool IsDigitsOnly(string str)
-=======
-        bool IsDigitsOnly(string str)
->>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
         {
             foreach (char c in str)
             {
@@ -152,11 +121,10 @@ namespace RafelFinalProj
             return true;
         }
 
-<<<<<<< HEAD
         private void AddElementToDictionary(XmlElement element)
         {
             string fieldName = element.InnerText;
-            int value =  ConvertTypeToInt(element.InnerText);
+            int value = ConvertTypeToInt(element.InnerText);
 
 
         }
@@ -184,9 +152,9 @@ namespace RafelFinalProj
 
         private int ConvertTypeToInt(string key)
         {
-            foreach(var e in sizeOfTypes)
+            foreach (var e in sizeOfTypes)
             {
-                if(e.Key.ToUpper().CompareTo(key.ToUpper()) == 0)
+                if (e.Key.ToUpper().CompareTo(key.ToUpper()) == 0)
                 {
                     return e.Value;
                 }
@@ -196,9 +164,5 @@ namespace RafelFinalProj
         }
 
 
-
-
-=======
->>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
     }
 }
