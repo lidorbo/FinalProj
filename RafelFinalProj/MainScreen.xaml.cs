@@ -21,7 +21,7 @@ namespace RafelFinalProj
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainScreen : Window
     {
         private const string WIRESHARK_LOADED = "Wireshark file loaded";
         private const string WIRESHARK_ERROR = "Wireshark file can't be loaded";
@@ -29,7 +29,7 @@ namespace RafelFinalProj
         private const string INVALID_SAVE_LOCATION_INI = "Invalid save path for ini";
         private const string INVALID_SAVE_LOCATION_LOG = "Invalid save path for log";
 
-        public MainWindow()
+        public MainScreen()
         {
             InitializeComponent();
         }
@@ -63,8 +63,11 @@ namespace RafelFinalProj
                 string statusMsg = XML_LOADED;
                 try
                 {
-                    XDocument xmlFile = new XDocument();
-                    xmlFile = XDocument.Load(xmlFD.FileName);
+                    //checks if the XML file is valid
+                    XmlDocument xmlFile = new XmlDocument();
+                    xmlFile.Load(xmlFD.FileName);
+                    //checks if the format is correct
+                    XmlParser xmlParser = new XmlParser(this, xmlFile);
                     xmlLoadTB.Text = xmlFD.FileName;
                 }
                 catch (XmlException exception)
