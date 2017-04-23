@@ -14,18 +14,25 @@ namespace RafelFinalProj
 
         MainScreen mainScreen;
         XmlDocument xmlFile;
+<<<<<<< HEAD
         Dictionary<string, int> xmlStructure;
         Dictionary<string, int> sizeOfTypes;
 
+=======
+>>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
 
         public XmlParser(MainScreen mainScreen, XmlDocument xmlFile)
         {
             this.mainScreen = mainScreen;
             this.xmlFile = xmlFile;
+<<<<<<< HEAD
             xmlStructure = new Dictionary<string, int>();
             InitSizeOfDictionary();
             ParseXml();
 
+=======
+            IsValidXmlFormat();
+>>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
         }
 
         /// <summary>
@@ -36,6 +43,7 @@ namespace RafelFinalProj
         /// </Message>
         /// </summary>
         /// <returns>true if the format is valid</returns>
+<<<<<<< HEAD
         private bool ParseXml()
         {
            string fieldName = "";
@@ -44,6 +52,13 @@ namespace RafelFinalProj
            XmlElement root = xmlFile.DocumentElement;
            XmlNodeList elements = root.ChildNodes;
 
+=======
+        private bool IsValidXmlFormat()
+        {
+            string fieldName = "";
+            XmlElement root = xmlFile.DocumentElement;
+            XmlNodeList elements = root.ChildNodes;
+>>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
            for (int i=0; i < elements.Count; i++)
            {
                 fieldName = elements[i].Name.ToUpper();
@@ -55,8 +70,11 @@ namespace RafelFinalProj
                             if (IsDigitsOnly(checkDigits))
                             {
                                 mainScreen.sysNotificationsLV.Items.Add(fieldName + " " + elements[i].InnerText);
+<<<<<<< HEAD
                                 keyValue = elements[i].InnerText;
                                 xmlStructure.Add(keyValue, 0);
+=======
+>>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
                             }
                             else
                             {
@@ -69,6 +87,7 @@ namespace RafelFinalProj
                             if (checkDigits[checkDigits.Length - 1] == 'S' && IsDigitsOnly(checkDigits.Substring(0, checkDigits.Length - 1)))
                             {
                                 mainScreen.sysNotificationsLV.Items.Add(fieldName + " " + elements[i].InnerText);
+<<<<<<< HEAD
                                 typeSize = ConvertTypeToInt(elements[i].InnerText);
                                 if(typeSize == 0)
                                 {
@@ -76,6 +95,8 @@ namespace RafelFinalProj
                                     return false;
                                 }
                                 xmlStructure[keyValue] = typeSize;
+=======
+>>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
                             }
                             else
                             {
@@ -83,8 +104,11 @@ namespace RafelFinalProj
                                 return false;
                             }                      
                     } 
+<<<<<<< HEAD
 
                     
+=======
+>>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
                 }
                 else
                 {
@@ -92,6 +116,7 @@ namespace RafelFinalProj
                     return false;
                 }
             }
+<<<<<<< HEAD
 
            string str = "";
            foreach (var e in xmlStructure)
@@ -101,16 +126,22 @@ namespace RafelFinalProj
 
            mainScreen.sysNotificationsLV.Items.Add(str);
 
+=======
+>>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
          
           return true;
         }
 
+<<<<<<< HEAD
         /// <summary>
         ///  This method get a string and check if it contains only digits.
         /// </summary>
         /// <param name="str"></param>
         /// <returns>True if only digits</returns>
         private bool IsDigitsOnly(string str)
+=======
+        bool IsDigitsOnly(string str)
+>>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
         {
             foreach (char c in str)
             {
@@ -121,6 +152,7 @@ namespace RafelFinalProj
             return true;
         }
 
+<<<<<<< HEAD
         private void AddElementToDictionary(XmlElement element)
         {
             string fieldName = element.InnerText;
@@ -166,5 +198,7 @@ namespace RafelFinalProj
 
 
 
+=======
+>>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
     }
 }

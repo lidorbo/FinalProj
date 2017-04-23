@@ -33,5 +33,8 @@ D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.Properties.Resources.r
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csproj.GenerateResource.Cache
 C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\MainScreen.g.cs
 C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\MainScreen.baml
+<<<<<<< HEAD
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\MainScreen.g.cs
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\MainScreen.baml
+=======
+>>>>>>> 0bc502179e1928145bc024a2689ae0f241359fe6
