@@ -121,14 +121,10 @@ namespace RafelFinalProj
             return true;
         }
 
-        private void AddElementToDictionary(XmlElement element)
-        {
-            string fieldName = element.InnerText;
-            int value = ConvertTypeToInt(element.InnerText);
 
-
-        }
-
+        /// <summary>
+        /// The method will initialize a new dictionary for different types of size.
+        /// </summary>
         private void InitSizeOfDictionary()
         {
             sizeOfTypes = new Dictionary<string, int>();
@@ -150,6 +146,11 @@ namespace RafelFinalProj
 
         }
 
+        /// <summary>
+        /// The method match key to it's size.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns>The acctual size in bytes. Return 0 if size is invalid</returns>
         private int ConvertTypeToInt(string key)
         {
             foreach (var e in sizeOfTypes)

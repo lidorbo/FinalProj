@@ -15,3 +15,4 @@ D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.Properties.Resources.r
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csproj.GenerateResource.Cache
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.exe
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.pdb
+D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csprojResolveAssemblyReference.cache

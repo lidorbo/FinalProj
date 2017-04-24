@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -116,5 +117,59 @@ namespace RafelFinalProj
         {
             sysNotificationsLV.Items.Clear();
         }
+
+        private void startScanBTN_Click(object sender, RoutedEventArgs e)
+        {
+            IsValidIP(); 
+        }
+
+        private bool IsValidIP()
+        {
+         
+           bool ipFromParse = ValidateIPv4(ipFromTB.Text);
+           bool ipToParse = ValidateIPv4(ipToTB.Text); 
+  
+           if (ipFromParse && ipToParse)
+           {
+               sysNotificationsLV.Items.Add(IsValidIpRange().ToString());
+               return IsValidIpRange();
+           }
+           return false;
+        }
+
+        public bool ValidateIPv4(string ipString)
+        {
+            if (String.IsNullOrWhiteSpace(ipString))
+            {
+                return true;
+            }
+
+            string[] splitValues = ipString.Split('.');
+            if (splitValues.Length != 4)
+            {
+                return false;
+            }
+
+            byte tempForParsing;
+
+            return splitValues.All(r => byte.TryParse(r, out tempForParsing));
+        }
+
+        public bool IsValidIpRange()
+        {
+            string[] splitIpTo = ipToTB.Text.Split('.');
+            string[] splitIpFrom = ipFromTB.Text.Split('.');
+
+            for(int i =0; i < splitIpTo.Length; i++)
+            {
+                if(Int32.Parse(splitIpTo[i]) < Int32.Parse(splitIpFrom[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
     }
 }

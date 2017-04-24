@@ -88,7 +88,6 @@
                         <RowDefinition SharedSizeGroup="A"/>
                         <RowDefinition SharedSizeGroup="A"/>
                         <RowDefinition SharedSizeGroup="A"/>
-                        <RowDefinition SharedSizeGroup="A"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -96,7 +95,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <!--Port From TB-->
-                    <Label Grid.Row="0" Grid.Column="0" Content="Port From - To:" HorizontalAlignment="Left" FontWeight="Bold"></Label>
+                    <Label Grid.Row="0" Grid.Column="0" Content="Port Range:" HorizontalAlignment="Left" FontWeight="Bold"></Label>
                     <Grid Grid.Row="0" Grid.Column="1" Margin="5" Background="{StaticResource brushWatermarkBackground}" Style="{StaticResource EntryFieldStyle}" >
                         <TextBlock Margin="5,2" Text="Port From" Foreground="{StaticResource brushWatermarkForeground}" 
                        Visibility="{Binding ElementName=portFromTB, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
@@ -109,7 +108,7 @@
                         <TextBox Name="portToTB" BorderBrush="{StaticResource brushWatermarkBorder}" Style="{DynamicResource RoundedTextbox}" />
                     </Grid>
                     <!--Packet Size From TB-->
-                    <Label Grid.Row="1" Grid.Column="0" Content="Packet Size From - To:" HorizontalAlignment="Left" FontWeight="Bold"></Label>
+                    <Label Grid.Row="1" Grid.Column="0" Content="Packet Size Range:" HorizontalAlignment="Left" FontWeight="Bold"></Label>
                     <Grid Grid.Row="1" Grid.Column="1" Margin="5" Background="{StaticResource brushWatermarkBackground}" Style="{StaticResource EntryFieldStyle}" >
                         <TextBlock Margin="5,2" Text="Packet Size From" Foreground="{StaticResource brushWatermarkForeground}" 
                        Visibility="{Binding ElementName=packetSizeFromTB, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
@@ -122,46 +121,33 @@
                         <TextBox Name="packetSizeToTB" BorderBrush="{StaticResource brushWatermarkBorder}" Style="{DynamicResource RoundedTextbox}" />
                     </Grid>
                     <!--IP Source From TB-->
-                    <Label Grid.Row="2" Grid.Column="0" Content="IP Source From - To:" HorizontalAlignment="Left" FontWeight="Bold"></Label>
+                    <Label Grid.Row="2" Grid.Column="0" Content="IP Range:" HorizontalAlignment="Left" FontWeight="Bold"></Label>
                     <Grid Grid.Row="2" Grid.Column="1" Margin="5" Background="{StaticResource brushWatermarkBackground}" Style="{StaticResource EntryFieldStyle}" >
-                        <TextBlock Margin="5,2" Text="IP Source From" Foreground="{StaticResource brushWatermarkForeground}" 
-                       Visibility="{Binding ElementName=ipSrcFromTB, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        <TextBox Name="ipSrcFromTB" BorderBrush="{StaticResource brushWatermarkBorder}" Style="{DynamicResource RoundedTextbox}" />
+                        <TextBlock Margin="5,2" Text="IP From" Foreground="{StaticResource brushWatermarkForeground}" 
+                       Visibility="{Binding ElementName=ipFromTB, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <TextBox Name="ipFromTB" BorderBrush="{StaticResource brushWatermarkBorder}" Style="{DynamicResource RoundedTextbox}" />
                     </Grid>
                     <!--IP Source To TB-->
                     <Grid Grid.Row="2" Grid.Column="2" Margin="5" Background="{StaticResource brushWatermarkBackground}" Style="{StaticResource EntryFieldStyle}" >
-                        <TextBlock Margin="5,2" Text="IP Source To" Foreground="{StaticResource brushWatermarkForeground}" 
-                       Visibility="{Binding ElementName=ipSrcToTB, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        <TextBox Name="ipSrcToTB" BorderBrush="{StaticResource brushWatermarkBorder}" Style="{DynamicResource RoundedTextbox}" />
-                    </Grid>
-                    <!--IP Destination From TB-->
-                    <Label Grid.Row="3" Grid.Column="0" Content="IP Destination From - To:" HorizontalAlignment="Left" FontWeight="Bold"></Label>
-                    <Grid Grid.Row="3" Grid.Column="1" Margin="5" Background="{StaticResource brushWatermarkBackground}" Style="{StaticResource EntryFieldStyle}" >
-                        <TextBlock Margin="5,2" Text="IP Destination From" Foreground="{StaticResource brushWatermarkForeground}" 
-                       Visibility="{Binding ElementName=ipDestFromTB, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        <TextBox Name="ipDestFromTB" BorderBrush="{StaticResource brushWatermarkBorder}" Style="{DynamicResource RoundedTextbox}" />
-                    </Grid>
-                    <!--IP Destination To TB-->
-                    <Grid Grid.Row="3" Grid.Column="2" Margin="5" Background="{StaticResource brushWatermarkBackground}" Style="{StaticResource EntryFieldStyle}" >
-                        <TextBlock Margin="5,2" Text="IP Destination To" Foreground="{StaticResource brushWatermarkForeground}" 
-                       Visibility="{Binding ElementName=ipDestToTB, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        <TextBox Name="ipDestToTB" BorderBrush="{StaticResource brushWatermarkBorder}" Style="{DynamicResource RoundedTextbox}" />
-                    </Grid>
+                        <TextBlock Margin="5,2" Text="IP To" Foreground="{StaticResource brushWatermarkForeground}" 
+                       Visibility="{Binding ElementName=ipToTB, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <TextBox Name="ipToTB" BorderBrush="{StaticResource brushWatermarkBorder}" Style="{DynamicResource RoundedTextbox}" />
+                    </Grid>                   
                     <!--Offset TB-->
-                    <Label Grid.Row="4" Grid.Column="0" Content="Offset:" HorizontalAlignment="Left" FontWeight="Bold"></Label>
-                    <Grid Grid.Row="4" Grid.Column="1" Margin="5" Background="{StaticResource brushWatermarkBackground}" Style="{StaticResource EntryFieldStyle}" >
+                    <Label Grid.Row="3" Grid.Column="0" Content="Offset:" HorizontalAlignment="Left" FontWeight="Bold"></Label>
+                    <Grid Grid.Row="3" Grid.Column="1" Margin="5" Background="{StaticResource brushWatermarkBackground}" Style="{StaticResource EntryFieldStyle}" >
                         <TextBlock Margin="5,2" Text="Offset" Foreground="{StaticResource brushWatermarkForeground}" 
                        Visibility="{Binding ElementName=offsetTB, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         <TextBox Name="offsetTB" BorderBrush="{StaticResource brushWatermarkBorder}" Style="{DynamicResource RoundedTextbox}" />
                     </Grid>
                     <!--Protocol RBs-->
-                    <Grid Grid.Row="5" Grid.Column="0">
+                    <Grid Grid.Row="4" Grid.Column="0">
                         <TextBlock Margin="3,5" Text="Protocol:" TextAlignment="Left" FontWeight="Bold"></TextBlock>
                     </Grid>
-                    <Grid Grid.Row="5" Grid.Column="1">
+                    <Grid Grid.Row="4" Grid.Column="1">
                         <RadioButton x:Name="tcpRB" GroupName="protocol" Content="TCP" VerticalAlignment="Center" HorizontalAlignment="Center" ClickMode="Press" IsChecked="True"/>
                     </Grid>
-                    <Grid Grid.Row="5" Grid.Column="2">
+                    <Grid Grid.Row="4" Grid.Column="2">
                         <RadioButton x:Name="udpRB" GroupName="protocol" Content="UDP" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press"/>
                     </Grid>
                     <!--IP RBs-->
@@ -188,7 +174,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="3*"/>
                 </Grid.RowDefinitions>
-                <Button Name="startScanBTN" Grid.Row="1" Grid.Column="1" Margin="7 10" Padding="100" Content="Start Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold"/>
+                <Button Name="startScanBTN" Grid.Row="1" Grid.Column="1" Margin="7 10" Padding="100" Content="Start Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold" Click="startScanBTN_Click"/>
                 <Button Name="stopScanBTN" Grid.Row="1" Grid.Column="2" Margin="7 10" Content="Stop Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold"/>
             </Grid>
         </StackPanel>
