@@ -29,6 +29,8 @@ namespace RafelFinalProj
         private const string XML_LOADED = "XML file loaded";
         private const string INVALID_SAVE_LOCATION_INI = "Invalid save path for ini";
         private const string INVALID_SAVE_LOCATION_LOG = "Invalid save path for log";
+        private const int MAX_PORT = 65535;
+
 
         public MainScreen()
         {
@@ -170,6 +172,38 @@ namespace RafelFinalProj
 
             return true;
         }
+
+        public bool IsPortValid()
+        {
+            int portFrom = int.Parse(portFromTB.Text);
+            int portTo = int.Parse(portToTB.Text);
+
+            if (IsRangeValid(portFrom, portTo) && (portFrom < MAX_PORT) && (portTo < MAX_PORT) && (portFrom >= 0) && (portTo >= 0))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsPacketSizeValid()
+        {
+            int packetSizeFrom = int.Parse(packetSizeFromTB.Text);
+            int packetSizeTo = int.Parse(packetSizeToTB.Text);
+
+            if(IsRangeValid(packetSizeFrom, packetSizeTo) && (packetSizeFrom > 0) && (packetSizeTo > 0))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsRangeValid(int number1, int number2)
+        {
+            return number2 > number1;
+        }
+
 
     }
 }

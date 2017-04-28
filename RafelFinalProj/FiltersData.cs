@@ -19,6 +19,7 @@ namespace RafelFinalProj
         public static ushort portFrom { get; set; }
         public static ushort portTo { get; set; }
         public static int offset { get; set; }
+        public static bool isLitleEndian { get; set; }
 
     }
 }
