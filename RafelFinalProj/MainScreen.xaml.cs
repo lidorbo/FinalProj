@@ -36,7 +36,11 @@ namespace RafelFinalProj
         {
             InitializeComponent();
         }
-
+        /// <summary>
+        /// Loads the Wireshark file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void wiresharkLogBrowseBTN_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog wiresharkFD = new OpenFileDialog();
@@ -55,6 +59,12 @@ namespace RafelFinalProj
 
         }
 
+
+        /// <summary>
+        /// The method will load and parse the XML file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void xmlLoadBTN_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog xmlFD = new OpenFileDialog();
@@ -86,6 +96,11 @@ namespace RafelFinalProj
             }
         }
 
+        /// <summary>
+        /// Picks the output location of the INI file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void iniSaveBTN_Click(object sender, RoutedEventArgs e)
         {
             FolderBrowserDialog iniLocationFBD = new FolderBrowserDialog();
@@ -101,6 +116,11 @@ namespace RafelFinalProj
 
         }
 
+        /// <summary>
+        /// Picks the location of the log file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void logSaveBTN_Click(object sender, RoutedEventArgs e)
         {
             FolderBrowserDialog logLocationFBD = new FolderBrowserDialog();
@@ -115,16 +135,30 @@ namespace RafelFinalProj
             }
         }
 
+        /// <summary>
+        /// Clears the notifications list view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void clearNotificationsBTN_Click(object sender, RoutedEventArgs e)
         {
             sysNotificationsLV.Items.Clear();
         }
 
+        /// <summary>
+        /// The method will start the scan, but beforehand, will check if all the input is correct
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void startScanBTN_Click(object sender, RoutedEventArgs e)
         {
             IsValidIP(); 
         }
 
+        /// <summary>
+        /// Checks if the inserted IPs are vaild and have a correct range. Will use the methods ValidateIP and IsValidIpRange.
+        /// </summary>
+        /// <returns></returns>
         private bool IsValidIP()
         {
          
@@ -139,6 +173,11 @@ namespace RafelFinalProj
            return false;
         }
 
+        /// <summary>
+        /// Checks if the IP is a valid IPv4 address
+        /// </summary>
+        /// <param name="ipString">The ip address</param>
+        /// <returns></returns>
         public bool ValidateIPv4(string ipString)
         {
             if (String.IsNullOrWhiteSpace(ipString))
@@ -157,14 +196,20 @@ namespace RafelFinalProj
             return splitValues.All(r => byte.TryParse(r, out tempForParsing));
         }
 
+        /// <summary>
+        /// Checks if the range of the inserted IPs is valid.
+        /// </summary>
+        /// <returns></returns>
         public bool IsValidIpRange()
         {
+            //each element in the array will contain a number between 0-255
             string[] splitIpTo = ipToTB.Text.Split('.');
             string[] splitIpFrom = ipFromTB.Text.Split('.');
 
             for(int i =0; i < splitIpTo.Length; i++)
             {
-                if(Int32.Parse(splitIpTo[i]) < Int32.Parse(splitIpFrom[i]))
+                //checks in the correlate elements if To is less than From.
+                if (Int32.Parse(splitIpTo[i]) < Int32.Parse(splitIpFrom[i]))
                 {
                     return false;
                 }
@@ -173,6 +218,10 @@ namespace RafelFinalProj
             return true;
         }
 
+        /// <summary>
+        /// Checks if the port is bigger than 65535 or less than 0 and if the ports have a valid range. Uses the IsRangeValid method.
+        /// </summary>
+        /// <returns></returns>
         public bool IsPortValid()
         {
             int portFrom = int.Parse(portFromTB.Text);
@@ -186,6 +235,10 @@ namespace RafelFinalProj
             return false;
         }
 
+        /// <summary>
+        /// Checks if the packet size is less than 0 and if it has a valid range. Uses the IsRangeValid method
+        /// </summary>
+        /// <returns></returns>
         public bool IsPacketSizeValid()
         {
             int packetSizeFrom = int.Parse(packetSizeFromTB.Text);
@@ -199,9 +252,31 @@ namespace RafelFinalProj
             return false;
         }
 
+        /// <summary>
+        /// Checks if the second number is bigger than the first
+        /// </summary>
+        /// <param name="number1"></param>
+        /// <param name="number2"></param>
+        /// <returns></returns>
         public bool IsRangeValid(int number1, int number2)
         {
             return number2 > number1;
+        }
+
+        /// <summary>
+        /// Checks if the offset is bigger than 0
+        /// </summary>
+        /// <returns></returns>
+        public bool IsOffsetVaild()
+        {
+            int offset = int.Parse(offsetTB.Text);
+            if(offset > 0)
+            {
+                return true;
+            }
+
+            return false;
+
         }
 
 
