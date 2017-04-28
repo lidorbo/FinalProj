@@ -8,10 +8,8 @@ namespace RafelFinalProj
 {
     static class FiltersData
     {
-        public static string ipDestFrom { get; set; }
-        public static string ipDestTo { get; set; }
-        public static string ipSrcFrom { get; set; }
-        public static string ipSrcTo { get; set; }
+        public static string ipDest { get; set; }
+        public static string ipSrc { get; set; }
         public static bool isIpV4 { get; set; }
         public static bool isUDP { get; set; }
         public static int packetSizeFrom { get; set; }
