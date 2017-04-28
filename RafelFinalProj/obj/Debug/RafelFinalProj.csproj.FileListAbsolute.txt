@@ -16,3 +16,6 @@ D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csproj.GenerateResourc
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.exe
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.pdb
 D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csprojResolveAssemblyReference.cache
+C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.exe.config
+C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.exe
+C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.pdb

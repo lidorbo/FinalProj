@@ -105,7 +105,7 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 102 "..\..\MainScreen.xaml"
+        #line 103 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.TextBox portFromTB;
         
@@ -113,7 +113,7 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 108 "..\..\MainScreen.xaml"
+        #line 109 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.TextBox portToTB;
         
@@ -121,7 +121,7 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 115 "..\..\MainScreen.xaml"
+        #line 116 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.TextBox packetSizeFromTB;
         
@@ -129,7 +129,7 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 121 "..\..\MainScreen.xaml"
+        #line 122 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.TextBox packetSizeToTB;
         
@@ -137,7 +137,7 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 128 "..\..\MainScreen.xaml"
+        #line 129 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.TextBox ipFromTB;
         
@@ -145,7 +145,7 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 134 "..\..\MainScreen.xaml"
+        #line 135 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.TextBox ipToTB;
         
@@ -153,7 +153,7 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 141 "..\..\MainScreen.xaml"
+        #line 142 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.TextBox offsetTB;
         
@@ -161,7 +161,7 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 148 "..\..\MainScreen.xaml"
+        #line 149 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.RadioButton tcpRB;
         
@@ -169,7 +169,7 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 151 "..\..\MainScreen.xaml"
+        #line 152 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.RadioButton udpRB;
         
@@ -177,7 +177,7 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 158 "..\..\MainScreen.xaml"
+        #line 159 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.RadioButton ipv4RB;
         
@@ -185,7 +185,7 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 161 "..\..\MainScreen.xaml"
+        #line 162 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.RadioButton ipv6RB;
         
@@ -193,17 +193,17 @@ namespace RafelFinalProj {
         #line hidden
         
         
-        #line 177 "..\..\MainScreen.xaml"
+        #line 169 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        internal System.Windows.Controls.Button startScanBTN;
+        internal System.Windows.Controls.RadioButton littleRB;
         
         #line default
         #line hidden
         
         
-        #line 178 "..\..\MainScreen.xaml"
+        #line 172 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        internal System.Windows.Controls.Button stopScanBTN;
+        internal System.Windows.Controls.RadioButton bigRB;
         
         #line default
         #line hidden
@@ -211,13 +211,29 @@ namespace RafelFinalProj {
         
         #line 188 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        internal System.Windows.Controls.ListView sysNotificationsLV;
+        internal System.Windows.Controls.Button startScanBTN;
         
         #line default
         #line hidden
         
         
         #line 189 "..\..\MainScreen.xaml"
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        internal System.Windows.Controls.Button stopScanBTN;
+        
+        #line default
+        #line hidden
+        
+        
+        #line 199 "..\..\MainScreen.xaml"
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        internal System.Windows.Controls.ListView sysNotificationsLV;
+        
+        #line default
+        #line hidden
+        
+        
+        #line 200 "..\..\MainScreen.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.Button clearNotificationsBTN;
         
@@ -336,24 +352,30 @@ namespace RafelFinalProj {
             this.ipv6RB = ((System.Windows.Controls.RadioButton)(target));
             return;
             case 20:
+            this.littleRB = ((System.Windows.Controls.RadioButton)(target));
+            return;
+            case 21:
+            this.bigRB = ((System.Windows.Controls.RadioButton)(target));
+            return;
+            case 22:
             this.startScanBTN = ((System.Windows.Controls.Button)(target));
             
-            #line 177 "..\..\MainScreen.xaml"
+            #line 188 "..\..\MainScreen.xaml"
             this.startScanBTN.Click += new System.Windows.RoutedEventHandler(this.startScanBTN_Click);
             
             #line default
             #line hidden
             return;
-            case 21:
+            case 23:
             this.stopScanBTN = ((System.Windows.Controls.Button)(target));
             return;
-            case 22:
+            case 24:
             this.sysNotificationsLV = ((System.Windows.Controls.ListView)(target));
             return;
-            case 23:
+            case 25:
             this.clearNotificationsBTN = ((System.Windows.Controls.Button)(target));
             
-            #line 189 "..\..\MainScreen.xaml"
+            #line 200 "..\..\MainScreen.xaml"
             this.clearNotificationsBTN.Click += new System.Windows.RoutedEventHandler(this.clearNotificationsBTN_Click);
             
             #line default
