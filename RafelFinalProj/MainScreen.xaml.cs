@@ -31,6 +31,16 @@ namespace RafelFinalProj
         private const string INVALID_SAVE_LOCATION_LOG = "Invalid save path for log";
         private const int MAX_PORT = 65535;
 
+        private const string IP_MSG_ERROR = "One or more IPs are not valid";
+        private const string PORT_MSG_ERROR = "Port is not valid";
+        private const string PORT_RANGE_MSG_ERROR = "Port range is not valid";
+        private const string PACKET_MSG_ERROR = "One or packet sizes are not valid";
+        private const string PACKET_SIZE_RANGE_ERROR = "Packet size range is not valid";
+        private const string OFFSET_MSG_ERROR = "Offset must be bigger than 0";
+        private const string SCAN_MSG = "Scan have started";
+        private const string SCAN_MSG_ERROR = "ERROR - Scan have not started!";
+
+
 
         public MainScreen()
         {
@@ -152,7 +162,25 @@ namespace RafelFinalProj
         /// <param name="e"></param>
         private void startScanBTN_Click(object sender, RoutedEventArgs e)
         {
-            IsValidIP(); 
+           bool ip = IsValidIP();
+           bool port = IsPortValid();
+           bool size = IsPacketSizeValid();
+           bool offset = IsOffsetVaild();
+
+           if(ip && port && size && offset)
+           {
+               Protocol();
+               IpType();
+               EndianType();
+               sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + SCAN_MSG);
+               WireSharkParse wp = new WireSharkParse("", wiresharkLogTB.Text, new Dictionary<string, int>(), this);
+
+           }
+           else
+           {
+               sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + SCAN_MSG_ERROR);
+           }
+
         }
 
         /// <summary>
@@ -161,16 +189,67 @@ namespace RafelFinalProj
         /// <returns></returns>
         private bool IsValidIP()
         {
-         
+     
            bool ipFromParse = ValidateIPv4(ipFromTB.Text);
            bool ipToParse = ValidateIPv4(ipToTB.Text); 
   
            if (ipFromParse && ipToParse)
            {
-               sysNotificationsLV.Items.Add(IsValidIpRange().ToString());
-               return IsValidIpRange();
+               FiltersData.ipSrc = ipFromTB.Text;
+               FiltersData.ipDest = ipToTB.Text;
+               return true;
            }
-           return false;
+
+           else if(ipFromParse && ipFromTB.Text.Length > 0)
+           {
+               FiltersData.ipSrc = ipFromTB.Text;
+               return true;
+           }
+
+           else if(ipToParse && ipToTB.Text.Length > 0 )
+           {
+               FiltersData.ipDest = ipToTB.Text;
+               return true;
+           }
+           sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + IP_MSG_ERROR);
+           return false ;
+        }
+
+        private void Protocol()
+        {
+            if(udpRB.IsChecked.Value)
+            {
+                FiltersData.isUDP = true;
+            }
+            else
+            {
+                FiltersData.isUDP = false;
+            }
+        }
+
+        private void IpType()
+        {
+            if (ipv4RB.IsChecked.Value)
+            {
+                FiltersData.isIpV4 = true;
+            }
+            else
+            {
+                FiltersData.isIpV4 = false;
+            }
+        }
+
+
+        private void EndianType()
+        {
+            if (littleRB.IsChecked.Value)
+            {
+                FiltersData.isLitleEndian = true;
+            }
+            else
+            {
+                FiltersData.isLitleEndian = false;
+            }
         }
 
         /// <summary>
@@ -224,15 +303,36 @@ namespace RafelFinalProj
         /// <returns></returns>
         public bool IsPortValid()
         {
-            int portFrom = int.Parse(portFromTB.Text);
-            int portTo = int.Parse(portToTB.Text);
-
-            if (IsRangeValid(portFrom, portTo) && (portFrom < MAX_PORT) && (portTo < MAX_PORT) && (portFrom >= 0) && (portTo >= 0))
+            if(portFromTB.Text.Length == 0 && portToTB.Text.Length == 0)
             {
                 return true;
             }
 
-            return false;
+            try
+            {
+                int portFrom = int.Parse(portFromTB.Text);
+                int portTo = int.Parse(portToTB.Text);
+                if (IsRangeValid(portFrom, portTo))
+                {
+                    if ((portFrom < MAX_PORT) && (portTo < MAX_PORT) && (portFrom > 0) && (portTo > 0))
+                    {
+                        FiltersData.portFrom = ushort.Parse(portFromTB.Text);
+                        FiltersData.portTo = ushort.Parse(portToTB.Text);
+                        return true;
+                    }
+                    sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PORT_MSG_ERROR);
+                    return false;
+
+                }
+                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PORT_RANGE_MSG_ERROR);
+                return false;
+            }
+            catch (Exception)
+            {
+                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PORT_MSG_ERROR);
+                return false;
+            }
+         
         }
 
         /// <summary>
@@ -241,15 +341,35 @@ namespace RafelFinalProj
         /// <returns></returns>
         public bool IsPacketSizeValid()
         {
-            int packetSizeFrom = int.Parse(packetSizeFromTB.Text);
-            int packetSizeTo = int.Parse(packetSizeToTB.Text);
-
-            if(IsRangeValid(packetSizeFrom, packetSizeTo) && (packetSizeFrom > 0) && (packetSizeTo > 0))
+            if (packetSizeFromTB.Text.Length == 0 && packetSizeToTB.Text.Length == 0)
             {
                 return true;
             }
 
-            return false;
+            try
+            {
+                int packetSizeFrom = int.Parse(packetSizeFromTB.Text);
+                int packetSizeTo = int.Parse(packetSizeToTB.Text);
+
+                if (IsRangeValid(packetSizeFrom, packetSizeTo))
+                {
+                    if ((packetSizeFrom > 0) && (packetSizeTo > 0))
+                    {
+                        FiltersData.packetSizeFrom = int.Parse(packetSizeFromTB.Text);
+                        FiltersData.packetSizeTo = int.Parse(packetSizeToTB.Text);
+                        return true;
+                    }
+                    sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PACKET_MSG_ERROR);
+                    return false;
+                }
+                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PACKET_SIZE_RANGE_ERROR);
+                return false;
+            }
+            catch (Exception)
+            {          
+               sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PACKET_MSG_ERROR);
+               return false;
+            }
         }
 
         /// <summary>
@@ -260,7 +380,7 @@ namespace RafelFinalProj
         /// <returns></returns>
         public bool IsRangeValid(int number1, int number2)
         {
-            return number2 > number1;
+            return number2 >= number1;
         }
 
         /// <summary>
@@ -269,13 +389,29 @@ namespace RafelFinalProj
         /// <returns></returns>
         public bool IsOffsetVaild()
         {
-            int offset = int.Parse(offsetTB.Text);
-            if(offset > 0)
+            if(offsetTB.Text.Length == 0)
             {
                 return true;
             }
 
-            return false;
+            try
+            {
+                int offset = int.Parse(offsetTB.Text);
+                if (offset > 0)
+                {
+                    FiltersData.offset = int.Parse(offsetTB.Text);
+                    return true;
+                }
+
+                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + OFFSET_MSG_ERROR);
+                return false;
+            }
+            catch (Exception)
+            {
+                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + OFFSET_MSG_ERROR);
+                return false;
+               
+            }
 
         }
 

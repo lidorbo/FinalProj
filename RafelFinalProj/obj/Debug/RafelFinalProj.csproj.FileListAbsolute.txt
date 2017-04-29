@@ -19,3 +19,7 @@ D:\Repo\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csprojResolveAssemblyR
 C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\bin\Debug\RafelFinalProj.exe.config
 C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.exe
 C:\Users\Nir\Documents\Visual Studio 2015\Projects\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.pdb
+D:\Repo\FinalProj\RafelFinalProj\bin\Debug\PacketDotNet.dll
+D:\Repo\FinalProj\RafelFinalProj\bin\Debug\SharpPcap.dll
+D:\Repo\FinalProj\RafelFinalProj\bin\Debug\PacketDotNet.xml
+D:\Repo\FinalProj\RafelFinalProj\bin\Debug\SharpPcap.xml

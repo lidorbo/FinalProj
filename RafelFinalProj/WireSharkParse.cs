@@ -17,7 +17,9 @@ namespace RafelFinalProj
         private FileStream iniFile;
         private MainScreen mainScreen;
         private int packetIndex = 0;
-
+        string temp = "";
+        private ulong numOfPackets = 0;
+        ICaptureDevice wireSharkFile;
 
         public WireSharkParse(string iniPath, string wireSharkPath, Dictionary<string, int> xmlStructure, MainScreen mainScreen)
         {
@@ -25,14 +27,43 @@ namespace RafelFinalProj
             this.wireSharkPath = wireSharkPath;
             this.xmlStructure = xmlStructure;
             this.mainScreen = mainScreen;
+            InitCaptureFile();
 
+            ParseWireShark();
+     
         }
+
+        private void InitCaptureFile()
+        {
+
+            try
+            {
+                wireSharkFile = new CaptureFileReaderDevice(wireSharkPath);
+                wireSharkFile.Open();
+                wireSharkFile.Filter = BuildFilterString();
+                wireSharkFile.OnPacketArrival +=
+                                          new PacketArrivalEventHandler(totalNumberOfPacket);
+
+                wireSharkFile.Capture();
+                mainScreen.sysNotificationsLV.Items.Add("Num is = " + numOfPackets);
+
+                //File.WriteAllText("scan.txt", temp);
+             //   wireSharkFile.Close();
+            }
+            catch (Exception e)
+            {
+                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Error " + e.Message);
+                return;
+            }
+        }
+
 
         public void CreateIniFile()
         {
             try
             {
                 iniFile = new FileStream(iniPath, FileMode.CreateNew);
+
 
             }
             catch (Exception e)
@@ -43,17 +74,17 @@ namespace RafelFinalProj
 
         public void ParseWireShark()
         {
-            ICaptureDevice wireSharkFile;
 
             try
             {
-                wireSharkFile = new CaptureFileReaderDevice(wireSharkPath);       
-                wireSharkFile.Open();
-                wireSharkFile.Filter = BuildFilterString();
+        
                 wireSharkFile.OnPacketArrival +=
                                           new PacketArrivalEventHandler(OnPacketArrival);
-
+              
                 wireSharkFile.Capture();
+               // mainScreen.sysNotificationsLV.Items.Add("Num is = " + numOfPackets);
+
+                File.WriteAllText("scan.txt", temp);
                 wireSharkFile.Close();
             }
             catch (Exception e)
@@ -65,6 +96,11 @@ namespace RafelFinalProj
 
         }
 
+        private void totalNumberOfPacket(object sender, CaptureEventArgs e)
+        {
+            ++numOfPackets;
+        }
+
 
         /// <summary>
         /// Prints the source and dest MAC addresses of each received Ethernet frame
@@ -72,7 +108,8 @@ namespace RafelFinalProj
         private void OnPacketArrival(object sender, CaptureEventArgs e)
         {
             string str = null;
-            if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet && packetIndex < 20)
+
+            if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet )
             {
                 var packet = PacketDotNet.Packet.ParsePacket(e.Packet.LinkLayerType, e.Packet.Data);
                 var ethernetPacket = (PacketDotNet.EthernetPacket)packet;
@@ -82,15 +119,18 @@ namespace RafelFinalProj
                 //Console.WriteLine("{0}", ethernetPacket.PayloadPacket.Bytes.Length.ToString());
                 int i = 0;
                 Console.WriteLine("Length = " + ethernetPacket.Bytes.Length.ToString() + " ");
-                string temp = "";
-                foreach (byte b in ethernetPacket.Bytes)
+
+                foreach (byte b in ethernetPacket.PayloadPacket.PayloadPacket.PayloadData)
                 {
-                    temp = b.ToString("x2") + " ";
+                    temp += b.ToString("x2") + " ";
                     i++;
                     if (i % 16 == 0)
                         temp += Environment.NewLine;
-
                 }
+                temp += Environment.NewLine;
+                temp += Environment.NewLine;
+                temp += Environment.NewLine;
+                mainScreen.sysNotificationsLV.Items.Add(temp);
 
                 str += ethernetPacket.PayloadPacket.ToString() + "\n";
                 packetIndex++;
@@ -105,9 +145,15 @@ namespace RafelFinalProj
             string temp = "";
             List<string> filter = new List<string>();
 
-            if(FiltersData.ipSrc != string.Empty && FiltersData.ipDest != string.Empty)
+            if(FiltersData.ipSrc != string.Empty)
             {
-                temp = "src " + FiltersData.ipSrc + " and dst " + FiltersData.ipDest;
+                temp = "src " + FiltersData.ipSrc;
+                filter.Add(temp);
+            }
+
+            if (FiltersData.ipDest != string.Empty)
+            {
+                temp = "dst " + FiltersData.ipDest;
                 filter.Add(temp);
             }
 
