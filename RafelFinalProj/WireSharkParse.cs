@@ -2,10 +2,13 @@
 using SharpPcap.LibPcap;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace RafelFinalProj
 {
@@ -19,7 +22,8 @@ namespace RafelFinalProj
         private int packetIndex = 0;
         string temp = "";
         private ulong numOfPackets = 0;
-        ICaptureDevice wireSharkFile;
+        int currentPacket = 0;
+        object senderProgress;
 
         public WireSharkParse(string iniPath, string wireSharkPath, Dictionary<string, int> xmlStructure, MainScreen mainScreen)
         {
@@ -27,14 +31,30 @@ namespace RafelFinalProj
             this.wireSharkPath = wireSharkPath;
             this.xmlStructure = xmlStructure;
             this.mainScreen = mainScreen;
-            InitCaptureFile();
+            CalcNumberOfPackets();
 
-            ParseWireShark();
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+            worker.DoWork += ParseWireShark;
+            worker.ProgressChanged += worker_ProgressChanged;
+
+            worker.RunWorkerAsync();
+
+            //Thread t = new Thread(ParseWireShark);
+            //t.IsBackground = true;
+            //t.Start();
      
         }
 
-        private void InitCaptureFile()
+        private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
+            mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                    new Action(() => mainScreen.scanProgressBar.Value = (100 * e.ProgressPercentage) / (int)numOfPackets));
+        }
+
+        private void CalcNumberOfPackets()
+        {
+            ICaptureDevice wireSharkFile;
 
             try
             {
@@ -42,13 +62,11 @@ namespace RafelFinalProj
                 wireSharkFile.Open();
                 wireSharkFile.Filter = BuildFilterString();
                 wireSharkFile.OnPacketArrival +=
-                                          new PacketArrivalEventHandler(totalNumberOfPacket);
-
+                                          new PacketArrivalEventHandler(totalNumberOfPackets);
                 wireSharkFile.Capture();
-                mainScreen.sysNotificationsLV.Items.Add("Num is = " + numOfPackets);
+                mainScreen.sysNotificationsLV.Items.Add("Number of packets: " + numOfPackets);
 
-                //File.WriteAllText("scan.txt", temp);
-             //   wireSharkFile.Close();
+                wireSharkFile.Close();
             }
             catch (Exception e)
             {
@@ -63,8 +81,6 @@ namespace RafelFinalProj
             try
             {
                 iniFile = new FileStream(iniPath, FileMode.CreateNew);
-
-
             }
             catch (Exception e)
             {
@@ -72,31 +88,52 @@ namespace RafelFinalProj
             }
         }
 
-        public void ParseWireShark()
+        public void ParseWireShark(object senderProgress, DoWorkEventArgs e)
         {
-
+            ICaptureDevice wireSharkFile;
+            this.senderProgress = senderProgress;
             try
             {
-        
+                wireSharkFile = new CaptureFileReaderDevice(wireSharkPath);
+                wireSharkFile.Open();
+                wireSharkFile.Filter = BuildFilterString();
                 wireSharkFile.OnPacketArrival +=
                                           new PacketArrivalEventHandler(OnPacketArrival);
-              
-                wireSharkFile.Capture();
-               // mainScreen.sysNotificationsLV.Items.Add("Num is = " + numOfPackets);
+                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                new Action(() => mainScreen.scanProgressBar.Visibility = System.Windows.Visibility.Visible));
+
+                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                 new Action(() => mainScreen.progressValue.Visibility = System.Windows.Visibility.Visible));
+
+                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                    new Action(() => mainScreen.sysNotificationsLV.Items.Add("Scanning")));
+
+                wireSharkFile.Capture();             
 
                 File.WriteAllText("scan.txt", temp);
+
+                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                  new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Scan completed")));
+
                 wireSharkFile.Close();
+
+                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                 new Action(() => mainScreen.scanProgressBar.Visibility = System.Windows.Visibility.Hidden));
+
+                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                 new Action(() => mainScreen.progressValue.Visibility = System.Windows.Visibility.Hidden));
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Error " + e.Message);
+                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                   new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Error " + ex.Message)));
                 return;
             }
 
 
         }
 
-        private void totalNumberOfPacket(object sender, CaptureEventArgs e)
+        private void totalNumberOfPackets(object sender, CaptureEventArgs e)
         {
             ++numOfPackets;
         }
@@ -108,17 +145,17 @@ namespace RafelFinalProj
         private void OnPacketArrival(object sender, CaptureEventArgs e)
         {
             string str = null;
-
-            if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet )
+            currentPacket++;
+            if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet)
             {
                 var packet = PacketDotNet.Packet.ParsePacket(e.Packet.LinkLayerType, e.Packet.Data);
                 var ethernetPacket = (PacketDotNet.EthernetPacket)packet;
 
 
-                Console.WriteLine("{0}", ethernetPacket.PayloadPacket.PrintHex());
+                //Console.WriteLine("{0}", ethernetPacket.PayloadPacket.PrintHex());
                 //Console.WriteLine("{0}", ethernetPacket.PayloadPacket.Bytes.Length.ToString());
                 int i = 0;
-                Console.WriteLine("Length = " + ethernetPacket.Bytes.Length.ToString() + " ");
+               // mainScreen.sysNotificationsLV.Items.Add("Length = " + ethernetPacket.Bytes.Length.ToString() + " ");
 
                 foreach (byte b in ethernetPacket.PayloadPacket.PayloadPacket.PayloadData)
                 {
@@ -130,13 +167,11 @@ namespace RafelFinalProj
                 temp += Environment.NewLine;
                 temp += Environment.NewLine;
                 temp += Environment.NewLine;
-                mainScreen.sysNotificationsLV.Items.Add(temp);
 
                 str += ethernetPacket.PayloadPacket.ToString() + "\n";
                 packetIndex++;
+                (senderProgress as BackgroundWorker).ReportProgress(currentPacket);
             }
-     
-
         }
 
         public string BuildFilterString()
@@ -189,6 +224,8 @@ namespace RafelFinalProj
                 return filterStr;
 
         }
+
+
 
 
 

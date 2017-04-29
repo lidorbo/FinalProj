@@ -188,6 +188,8 @@
                 <Button Name="startScanBTN" Grid.Row="1" Grid.Column="1" Margin="7 10" Padding="100" Content="Start Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold" Click="startScanBTN_Click"/>
                 <Button Name="stopScanBTN" Grid.Row="1" Grid.Column="2" Margin="7 10" Content="Stop Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold"/>
             </Grid>
+            <ProgressBar Name="scanProgressBar" Grid.Row="2" Height="40px" VerticalAlignment="Center" Margin="10 10" Minimum="0" Maximum="100" Value="0" Visibility="Hidden"></ProgressBar>
+            <TextBlock Name="progressValue" Text="{Binding ElementName=scanProgressBar, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="-38" Visibility="Hidden"/>
         </StackPanel>
         <Grid Grid.Row="0" Grid.Column="1">
             <Grid.RowDefinitions>

@@ -174,7 +174,6 @@ namespace RafelFinalProj
                EndianType();
                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + SCAN_MSG);
                WireSharkParse wp = new WireSharkParse("", wiresharkLogTB.Text, new Dictionary<string, int>(), this);
-
            }
            else
            {
