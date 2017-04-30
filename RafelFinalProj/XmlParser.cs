@@ -10,22 +10,31 @@ namespace RafelFinalProj
 {
     class XmlParser
     {
-        const string FIELD = "FIELD";
+        private const string FIELD = "FIELD";
 
-        MainScreen mainScreen;
-        XmlDocument xmlFile;
-        Dictionary<string, int> xmlStructure;
-        Dictionary<string, int> sizeOfTypes;
+        private MainScreen mainScreen;
+        private XmlDocument xmlFile;
+        private List<FieldStructure> fieldsList;
+        private Dictionary<string, int> sizeOfTypes;
 
 
         public XmlParser(MainScreen mainScreen, XmlDocument xmlFile)
         {
             this.mainScreen = mainScreen;
             this.xmlFile = xmlFile;
-            xmlStructure = new Dictionary<string, int>();
+            fieldsList = new List<FieldStructure>();
             InitSizeOfDictionary();
-            ParseXml();
+          //  ParseXml();
+        }
 
+        public List<FieldStructure> GetFieldsList()
+        {
+            if(ParseXml())
+            {
+                return fieldsList;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -43,6 +52,8 @@ namespace RafelFinalProj
             int typeSize = 0;
             XmlElement root = xmlFile.DocumentElement;
             XmlNodeList elements = root.ChildNodes;
+            FieldStructure fs;
+            fs = new FieldStructure();
 
             for (int i = 0; i < elements.Count; i++)
             {
@@ -56,7 +67,8 @@ namespace RafelFinalProj
                         {
                             mainScreen.sysNotificationsLV.Items.Add(fieldName + " " + elements[i].InnerText);
                             keyValue = elements[i].InnerText;
-                            xmlStructure.Add(keyValue, 0);
+                            fs.fieldName = keyValue;
+                            //xmlStructure.Add(keyValue, 0);
                         }
                         else
                         {
@@ -69,13 +81,18 @@ namespace RafelFinalProj
                         if (checkDigits[checkDigits.Length - 1] == 'S' && IsDigitsOnly(checkDigits.Substring(0, checkDigits.Length - 1)))
                         {
                             mainScreen.sysNotificationsLV.Items.Add(fieldName + " " + elements[i].InnerText);
-                            typeSize = ConvertTypeToInt(elements[i].InnerText);
+                            typeSize = ConvertTypeToInt(elements[i].InnerText, fs);
+
                             if (typeSize == 0)
                             {
                                 mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Invalid type " + elements[i].InnerText);
                                 return false;
                             }
-                            xmlStructure[keyValue] = typeSize;
+
+                            fs.size = typeSize;
+                            fieldsList.Add(fs);
+                            fs = new FieldStructure();
+
                         }
                         else
                         {
@@ -94,12 +111,14 @@ namespace RafelFinalProj
             }
 
             string str = "";
-            foreach (var e in xmlStructure)
+
+            foreach (var e in fieldsList)
             {
-                str += e.Key + " " + e.Value + "\n";
+                str += "Test "+ e.fieldName + " " + e.size + " " + e.type + "\n" ;
             }
 
             mainScreen.sysNotificationsLV.Items.Add(str);
+            mainScreen.sysNotificationsLV.Items.Add("count = "+fieldsList.Count);
 
 
             return true;
@@ -151,12 +170,13 @@ namespace RafelFinalProj
         /// </summary>
         /// <param name="key"></param>
         /// <returns>The acctual size in bytes. Return 0 if size is invalid</returns>
-        private int ConvertTypeToInt(string key)
+        private int ConvertTypeToInt(string key, FieldStructure fs)
         {
             foreach (var e in sizeOfTypes)
             {
                 if (e.Key.ToUpper().CompareTo(key.ToUpper()) == 0)
                 {
+                    fs.type = e.Key;
                     return e.Value;
                 }
             }

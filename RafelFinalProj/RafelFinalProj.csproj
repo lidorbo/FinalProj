@@ -63,6 +63,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ConstValues.cs" />
+    <Compile Include="FieldStructure.cs" />
     <Compile Include="FiltersData.cs" />
     <Compile Include="TextInputToVisibilityConverter.cs" />
     <Compile Include="WireSharkParse.cs" />

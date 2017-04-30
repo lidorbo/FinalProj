@@ -16,7 +16,7 @@ namespace RafelFinalProj
     {
         private string iniPath;
         private string wireSharkPath;
-        private Dictionary<string, int> xmlStructure;
+        private List<FieldStructure> fieldsList;
         private FileStream iniFile;
         private MainScreen mainScreen;
         private int packetIndex = 0;
@@ -24,26 +24,36 @@ namespace RafelFinalProj
         private ulong numOfPackets = 0;
         int currentPacket = 0;
         object senderProgress;
+        List<string> keyStr = null;
+        Dictionary<string, List<string>> scanResults;
 
-        public WireSharkParse(string iniPath, string wireSharkPath, Dictionary<string, int> xmlStructure, MainScreen mainScreen)
+        public WireSharkParse(string iniPath, string wireSharkPath, List<FieldStructure> fieldsList, MainScreen mainScreen)
         {
             this.iniPath = iniPath;
             this.wireSharkPath = wireSharkPath;
-            this.xmlStructure = xmlStructure;
+            this.fieldsList = fieldsList;
             this.mainScreen = mainScreen;
             CalcNumberOfPackets();
+            keyStr = new List<string>();
+            InitScanResults();
 
             BackgroundWorker worker = new BackgroundWorker();
             worker.WorkerReportsProgress = true;
             worker.DoWork += ParseWireShark;
             worker.ProgressChanged += worker_ProgressChanged;
-
             worker.RunWorkerAsync();
-
-            //Thread t = new Thread(ParseWireShark);
-            //t.IsBackground = true;
-            //t.Start();
      
+        }
+
+        private void InitScanResults()
+        {
+            scanResults = new Dictionary<string, List<string>>();       
+            foreach(var f in fieldsList)
+            {
+                List<string> str = new List<string>();
+                str.Add(f.type);
+                scanResults.Add(f.fieldName, str);
+            }
         }
 
         private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -138,7 +148,7 @@ namespace RafelFinalProj
             ++numOfPackets;
         }
 
-
+       
         /// <summary>
         /// Prints the source and dest MAC addresses of each received Ethernet frame
         /// </summary>
@@ -150,28 +160,95 @@ namespace RafelFinalProj
             {
                 var packet = PacketDotNet.Packet.ParsePacket(e.Packet.LinkLayerType, e.Packet.Data);
                 var ethernetPacket = (PacketDotNet.EthernetPacket)packet;
-
-
-                //Console.WriteLine("{0}", ethernetPacket.PayloadPacket.PrintHex());
-                //Console.WriteLine("{0}", ethernetPacket.PayloadPacket.Bytes.Length.ToString());
-                int i = 0;
-               // mainScreen.sysNotificationsLV.Items.Add("Length = " + ethernetPacket.Bytes.Length.ToString() + " ");
-
-                foreach (byte b in ethernetPacket.PayloadPacket.PayloadPacket.PayloadData)
+                //int i = 0;
+                int packetSize = ethernetPacket.PayloadPacket.PayloadPacket.PayloadData.Length;
+                int fieldCount = 0, fieldSize = 0;
+                byte[] packetData = ethernetPacket.PayloadPacket.PayloadPacket.PayloadData;
+                byte[] temp;
+                int tempIndex = 0;
+                for (int i = 0; i < packetSize; i += fieldSize)
                 {
-                    temp += b.ToString("x2") + " ";
-                    i++;
-                    if (i % 16 == 0)
-                        temp += Environment.NewLine;
-                }
-                temp += Environment.NewLine;
-                temp += Environment.NewLine;
-                temp += Environment.NewLine;
+                    fieldSize = fieldsList[i].size;
+                    temp = new byte[fieldSize];
+                    tempIndex = 0;
+                    if ((i + fieldSize) < packetData.Length)
+                    {
+                        for (int j = i; j < fieldSize; j++)
+                        {
+                            temp[tempIndex] = packetData[j];
+                            tempIndex++;
+                         }
+                        ConvertBytesToNumber(temp, fieldsList[i].type, fieldsList[i].fieldName);
 
-                str += ethernetPacket.PayloadPacket.ToString() + "\n";
-                packetIndex++;
-                (senderProgress as BackgroundWorker).ReportProgress(currentPacket);
+                        
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                }           
             }
+        }
+
+        public void print()
+        {
+            string str = "";
+
+            foreach(var x in scanResults)
+            {
+                str += x.Key + "\n";
+                foreach(var s in x.Value)
+                {
+                    str += s + "\n";
+                }
+
+                str += "\n\n\n";
+            }
+            File.WriteAllText("scan1.txt", str);
+        }
+
+        private void ConvertBytesToNumber(byte[] data, string type, string fieldName)
+        {
+            if(FiltersData.isLitleEndian)
+            {
+                Array.Reverse(data);
+            }
+
+
+            string value = string.Empty;
+
+            switch(type)
+            {
+                case ConstValues.CHAR:
+                    value = data[0].ToString();
+                    break;
+                case ConstValues.INT32:
+                   value = BitConverter.ToInt32(data, 0).ToString();
+                    break;
+                case ConstValues.INT64:
+                    value = BitConverter.ToInt64(data, 0).ToString();
+                    break;
+                case ConstValues.SHORT:
+                    value = BitConverter.ToInt16(data, 0).ToString();
+                    break;
+                case ConstValues.UCHAR:
+                    value = Convert.ToChar(data).ToString();
+                    break;
+                case ConstValues.UINT32:
+                    value = BitConverter.ToUInt32(data, 0).ToString();
+                    break;
+                case ConstValues.UINT64:
+                    value = BitConverter.ToUInt64(data, 0).ToString();
+                    break;
+                case ConstValues.USHORT:
+                   value = BitConverter.ToUInt16(data, 0).ToString();
+                    break;
+            }
+
+           scanResults[fieldName].Add(value);
+
+
         }
 
         public string BuildFilterString()
@@ -224,9 +301,6 @@ namespace RafelFinalProj
                 return filterStr;
 
         }
-
-
-
 
 
 

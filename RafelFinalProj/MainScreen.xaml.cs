@@ -40,7 +40,7 @@ namespace RafelFinalProj
         private const string SCAN_MSG = "Scan have started";
         private const string SCAN_MSG_ERROR = "ERROR - Scan have not started!";
 
-
+        private XmlParser xmlParser;
 
         public MainScreen()
         {
@@ -90,8 +90,9 @@ namespace RafelFinalProj
                     XmlDocument xmlFile = new XmlDocument();
                     xmlFile.Load(xmlFD.FileName);
                     //checks if the format is correct
-                    XmlParser xmlParser = new XmlParser(this, xmlFile);
+                    xmlParser = new XmlParser(this, xmlFile);
                     xmlLoadTB.Text = xmlFD.FileName;
+                    
                 }
                 catch (XmlException exception)
                 {
@@ -173,7 +174,15 @@ namespace RafelFinalProj
                IpType();
                EndianType();
                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + SCAN_MSG);
-               WireSharkParse wp = new WireSharkParse("", wiresharkLogTB.Text, new Dictionary<string, int>(), this);
+               List<FieldStructure> fieldStructure = xmlParser.GetFieldsList();
+               if (fieldStructure != null)
+               {
+                   WireSharkParse wp = new WireSharkParse(iniSaveTB.Text, wiresharkLogTB.Text, fieldStructure, this);
+               }
+               else
+               {
+                   //TODO - Fail Message 
+               }
            }
            else
            {
