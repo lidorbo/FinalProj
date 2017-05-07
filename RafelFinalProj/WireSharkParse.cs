@@ -20,7 +20,6 @@ namespace RafelFinalProj
         private FileStream iniFile;
         private MainScreen mainScreen;
         private int packetIndex = 0;
-        string temp = "";
         private ulong numOfPackets = 0;
         int currentPacket = 0;
         object senderProgress;
@@ -36,6 +35,7 @@ namespace RafelFinalProj
             CalcNumberOfPackets();
             keyStr = new List<string>();
             InitScanResults();
+            CreateIniFile();
 
             BackgroundWorker worker = new BackgroundWorker();
             worker.WorkerReportsProgress = true;
@@ -90,12 +90,34 @@ namespace RafelFinalProj
         {
             try
             {
-                iniFile = new FileStream(iniPath, FileMode.CreateNew);
+                iniFile = new FileStream(iniPath + "\\iniFile.txt", FileMode.CreateNew);
             }
             catch (Exception e)
             {
                 mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Error " + e.Message);
             }
+        }
+
+        public void WriteToIniFile()
+        {
+            int i = 0;
+            string str = "";
+            foreach (var b in scanResults)
+            {
+                str += "//" + b.Value[0] + Environment.NewLine + Environment.NewLine;
+                str += "[" + b.Key + "]" + Environment.NewLine + Environment.NewLine;
+                foreach (var s in b.Value)
+                {
+                    str += s + Environment.NewLine;
+                    i++;
+                }
+            }
+            byte[] data = Encoding.Unicode.GetBytes(str);
+
+            iniFile.Write(data, 0, data.Length);
+            iniFile.Flush();
+            iniFile.Close();
+
         }
 
         public void ParseWireShark(object senderProgress, DoWorkEventArgs e)
@@ -118,10 +140,8 @@ namespace RafelFinalProj
                 mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
                     new Action(() => mainScreen.sysNotificationsLV.Items.Add("Scanning")));
 
-                wireSharkFile.Capture();             
-
-                File.WriteAllText("scan.txt", temp);
-
+                wireSharkFile.Capture();
+                WriteToIniFile();
                 mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
                   new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Scan completed")));
 
@@ -160,32 +180,48 @@ namespace RafelFinalProj
             {
                 var packet = PacketDotNet.Packet.ParsePacket(e.Packet.LinkLayerType, e.Packet.Data);
                 var ethernetPacket = (PacketDotNet.EthernetPacket)packet;
-                //int i = 0;
+                int loopCounter = 0;
                 int packetSize = ethernetPacket.PayloadPacket.PayloadPacket.PayloadData.Length;
                 int fieldCount = 0, fieldSize = 0;
                 byte[] packetData = ethernetPacket.PayloadPacket.PayloadPacket.PayloadData;
-                byte[] temp;
+                byte[] currentField;
                 int tempIndex = 0;
+
+                if (FiltersData.packetSizeFrom != -1 && FiltersData.packetSizeTo != -1)
+                {
+                    if(packetSize < FiltersData.portFrom || packetSize > FiltersData.portTo)
+                    {
+                        return;
+                    }
+                }
+
                 for (int i = 0; i < packetSize; i += fieldSize)
                 {
-                    fieldSize = fieldsList[i].size;
-                    temp = new byte[fieldSize];
+                    if (loopCounter > fieldsList.Count - 1)
+                    {
+                        break;
+                    }
+
+                    fieldSize = fieldsList[loopCounter].size;
+                    currentField = new byte[fieldSize];
                     tempIndex = 0;
+
                     if ((i + fieldSize) < packetData.Length)
                     {
-                        for (int j = i; j < fieldSize; j++)
+                        for (int j = i; j < (i + fieldSize); j++)
                         {
-                            temp[tempIndex] = packetData[j];
+                            currentField[tempIndex] = packetData[j];
                             tempIndex++;
-                         }
-                        ConvertBytesToNumber(temp, fieldsList[i].type, fieldsList[i].fieldName);
-
+                        }
+                        ConvertBytesToNumber(currentField, fieldsList[loopCounter].type, fieldsList[loopCounter].fieldName);
                         
                     }
                     else
                     {
                         break;
                     }
+
+                    loopCounter++;
 
                 }           
             }
