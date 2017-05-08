@@ -54,6 +54,7 @@ namespace RafelFinalProj
             XmlNodeList elements = root.ChildNodes;
             FieldStructure fs;
             fs = new FieldStructure();
+            fieldsList.Clear();
 
             for (int i = 0; i < elements.Count; i++)
             {

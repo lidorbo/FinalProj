@@ -351,6 +351,8 @@ namespace RafelFinalProj
         {
             if (packetSizeFromTB.Text.Length == 0 && packetSizeToTB.Text.Length == 0)
             {
+                FiltersData.packetSizeFrom = -1;
+                FiltersData.packetSizeTo = -1;
                 return true;
             }
 

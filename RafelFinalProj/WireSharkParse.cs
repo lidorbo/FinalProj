@@ -88,29 +88,55 @@ namespace RafelFinalProj
 
         public void CreateIniFile()
         {
+            string iniFileName = iniPath + "\\" + Path.GetFileNameWithoutExtension(wireSharkPath) + "_" + DateTime.Today.ToString("dd-MM-yyyy");
             try
             {
-                iniFile = new FileStream(iniPath + "\\iniFile.txt", FileMode.CreateNew);
+                iniFile = new FileStream(iniFileName +".ini", FileMode.CreateNew);
+            }
+            catch(IOException ex)
+            {
+                int count = 0;
+
+                while (File.Exists(iniFileName + "_" + count + ".ini"))
+                {
+                    count++;
+                }
+
+                iniFile = new FileStream(iniFileName + "_" + count + ".ini", FileMode.CreateNew);
             }
             catch (Exception e)
             {
                 mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Error " + e.Message);
             }
+            finally
+            {
+                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Create a new ini file");
+
+            }
+
         }
 
         public void WriteToIniFile()
         {
-            int i = 0;
             string str = "";
             foreach (var b in scanResults)
             {
-                str += "//" + b.Value[0] + Environment.NewLine + Environment.NewLine;
-                str += "[" + b.Key + "]" + Environment.NewLine + Environment.NewLine;
-                foreach (var s in b.Value)
+                str += "//" + b.Value[0] + Environment.NewLine;
+                str += "[" + b.Key + "]" + Environment.NewLine;
+                for (int i = 0; i < b.Value.Count; i++)
                 {
-                    str += s + Environment.NewLine;
-                    i++;
+                    if(i == 0)
+                    {
+                        str += "Number of entries - " + b.Value.Count + Environment.NewLine;
+                    }
+                    else
+                    {
+                        str += b.Value[i] + Environment.NewLine;
+                    }
+               
                 }
+                str += Environment.NewLine + Environment.NewLine;
+
             }
             byte[] data = Encoding.Unicode.GetBytes(str);
 
@@ -141,11 +167,11 @@ namespace RafelFinalProj
                     new Action(() => mainScreen.sysNotificationsLV.Items.Add("Scanning")));
 
                 wireSharkFile.Capture();
-                WriteToIniFile();
                 mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
                   new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Scan completed")));
 
                 wireSharkFile.Close();
+                WriteToIniFile();
 
                 mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
                  new Action(() => mainScreen.scanProgressBar.Visibility = System.Windows.Visibility.Hidden));
@@ -189,7 +215,7 @@ namespace RafelFinalProj
 
                 if (FiltersData.packetSizeFrom != -1 && FiltersData.packetSizeTo != -1)
                 {
-                    if(packetSize < FiltersData.portFrom || packetSize > FiltersData.portTo)
+                    if(packetSize < FiltersData.packetSizeFrom || packetSize > FiltersData.packetSizeTo)
                     {
                         return;
                     }
