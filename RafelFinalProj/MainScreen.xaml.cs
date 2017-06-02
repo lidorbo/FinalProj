@@ -39,7 +39,7 @@ namespace RafelFinalProj
         private const string OFFSET_MSG_ERROR = "Offset must be bigger than 0";
         private const string SCAN_MSG = "Scan have started";
         private const string SCAN_MSG_ERROR = "ERROR - Scan have not started!";
-
+        private const string FIELD_MISSING_ERROR = "ERROR - One or more fields are missing.";
         private XmlParser xmlParser;
 
         public MainScreen()
@@ -168,6 +168,13 @@ namespace RafelFinalProj
            bool size = IsPacketSizeValid();
            bool offset = IsOffsetVaild();
 
+           if(wiresharkLogTB.Text.Length == 0 || xmlLoadTB.Text.Length == 0 
+               || iniSaveTB.Text.Length == 0 || logSaveTB.Text.Length == 0)
+           {
+               sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + FIELD_MISSING_ERROR);
+               return;
+           }
+
            if(ip && port && size && offset)
            {
                Protocol();
@@ -175,9 +182,10 @@ namespace RafelFinalProj
                EndianType();
                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + SCAN_MSG);
                List<FieldStructure> fieldStructure = xmlParser.GetFieldsList();
+               LogWriter lw = new LogWriter(logSaveTB.Text, this, xmlLoadTB.Text, wiresharkLogTB.Text);
                if (fieldStructure != null)
                {
-                   WireSharkParse wp = new WireSharkParse(iniSaveTB.Text, wiresharkLogTB.Text, fieldStructure, this);
+                   WireSharkParse wp = new WireSharkParse(iniSaveTB.Text, wiresharkLogTB.Text, fieldStructure, this, lw);
                }
                else
                {
@@ -189,6 +197,11 @@ namespace RafelFinalProj
                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + SCAN_MSG_ERROR);
            }
 
+        }
+
+        public void WriteNotification(string str)
+        {
+            sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + str);
         }
 
         /// <summary>

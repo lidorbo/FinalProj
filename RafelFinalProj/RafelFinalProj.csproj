@@ -66,6 +66,7 @@
     <Compile Include="ConstValues.cs" />
     <Compile Include="FieldStructure.cs" />
     <Compile Include="FiltersData.cs" />
+    <Compile Include="LogWriter.cs" />
     <Compile Include="TextInputToVisibilityConverter.cs" />
     <Compile Include="WireSharkParse.cs" />
     <Compile Include="XmlParser.cs" />

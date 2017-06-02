@@ -19,19 +19,23 @@ namespace RafelFinalProj
         private List<FieldStructure> fieldsList;
         private FileStream iniFile;
         private MainScreen mainScreen;
-        private int packetIndex = 0;
         private ulong numOfPackets = 0;
         int currentPacket = 0;
         object senderProgress;
+        long firstPacketTime;
         List<string> keyStr = null;
         Dictionary<string, List<string>> scanResults;
+        private ICaptureDevice getFirstPacket;
+        LogWriter logWriter;
 
-        public WireSharkParse(string iniPath, string wireSharkPath, List<FieldStructure> fieldsList, MainScreen mainScreen)
+        public WireSharkParse(string iniPath, string wireSharkPath, List<FieldStructure> fieldsList, MainScreen mainScreen, LogWriter logWriter)
         {
             this.iniPath = iniPath;
             this.wireSharkPath = wireSharkPath;
             this.fieldsList = fieldsList;
             this.mainScreen = mainScreen;
+            this.logWriter = logWriter;
+            GetFirstPacketTime();
             CalcNumberOfPackets();
             keyStr = new List<string>();
             InitScanResults();
@@ -54,6 +58,34 @@ namespace RafelFinalProj
                 str.Add(f.type);
                 scanResults.Add(f.fieldName, str);
             }
+        }
+
+        private void GetFirstPacketTime()
+        {
+
+            try
+            {
+                getFirstPacket = new CaptureFileReaderDevice(wireSharkPath);
+                getFirstPacket.Open();
+                getFirstPacket.OnPacketArrival +=
+                                          new PacketArrivalEventHandler(GetInitTime);
+                getFirstPacket.Capture();
+                mainScreen.sysNotificationsLV.Items.Add("Time of first : " + firstPacketTime);
+                getFirstPacket.Close();
+            }
+            catch (Exception e)
+            {
+                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Error " + e.Message);
+                return;
+            }
+        }
+
+        private void GetInitTime(object sender, CaptureEventArgs e)
+        {
+             string time = e.Packet.Timeval.Seconds + "." + e.Packet.Timeval.MicroSeconds;
+             firstPacketTime = e.Packet.Timeval.Date.Ticks;
+             getFirstPacket.OnPacketArrival -=
+                                          new PacketArrivalEventHandler(GetInitTime);           
         }
 
         private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -118,26 +150,36 @@ namespace RafelFinalProj
 
         public void WriteToIniFile()
         {
-            string str = "";
-            foreach (var b in scanResults)
+            string str = String.Empty;
+            string timeTag = String.Empty;
+            string[] temp;
+
+            foreach (var packet in scanResults)
             {
-                str += "//" + b.Value[0] + Environment.NewLine;
-                str += "[" + b.Key + "]" + Environment.NewLine;
-                for (int i = 0; i < b.Value.Count; i++)
+                str += "//" + packet.Value[0] + Environment.NewLine;
+                str += "[" + packet.Key + "]" + Environment.NewLine;
+                logWriter.WriteToLog("[" + packet.Key + "]" + Environment.NewLine);
+
+                for (int i = 0; i < packet.Value.Count; i++)
                 {
                     if(i == 0)
                     {
-                        str += "Number of entries - " + b.Value.Count + Environment.NewLine;
+                        str += "Number of entries - " + packet.Value.Count + Environment.NewLine;
                     }
                     else
                     {
-                        str += b.Value[i] + Environment.NewLine;
+                        temp = packet.Value[i].Split(';');
+                        str += temp[0] + Environment.NewLine;
+                        timeTag = temp[1];
+                        logWriter.WriteToLog(timeTag + Environment.NewLine);
                     }
                
                 }
                 str += Environment.NewLine + Environment.NewLine;
+                logWriter.WriteToLog(Environment.NewLine + Environment.NewLine);
 
             }
+            logWriter.Finish();
             byte[] data = Encoding.Unicode.GetBytes(str);
 
             iniFile.Write(data, 0, data.Length);
@@ -200,7 +242,6 @@ namespace RafelFinalProj
         /// </summary>
         private void OnPacketArrival(object sender, CaptureEventArgs e)
         {
-            string str = null;
             currentPacket++;
             if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet)
             {
@@ -208,10 +249,13 @@ namespace RafelFinalProj
                 var ethernetPacket = (PacketDotNet.EthernetPacket)packet;
                 int loopCounter = 0;
                 int packetSize = ethernetPacket.PayloadPacket.PayloadPacket.PayloadData.Length;
-                int fieldCount = 0, fieldSize = 0;
+                int fieldSize = 0;
                 byte[] packetData = ethernetPacket.PayloadPacket.PayloadPacket.PayloadData;
                 byte[] currentField;
                 int tempIndex = 0;
+                string currentTimeTag = null;
+                long timeDelta;
+                double second;
 
                 if (FiltersData.packetSizeFrom != -1 && FiltersData.packetSizeTo != -1)
                 {
@@ -239,7 +283,11 @@ namespace RafelFinalProj
                             currentField[tempIndex] = packetData[j];
                             tempIndex++;
                         }
-                        ConvertBytesToNumber(currentField, fieldsList[loopCounter].type, fieldsList[loopCounter].fieldName);
+
+                        currentTimeTag = e.Packet.Timeval.Seconds + "." + e.Packet.Timeval.MicroSeconds;
+                        timeDelta = e.Packet.Timeval.Date.Ticks - firstPacketTime;
+                        second = (double)timeDelta / 10000000.0;
+                        ConvertBytesToNumber(currentField, fieldsList[loopCounter].type, fieldsList[loopCounter].fieldName, second.ToString());
                         
                     }
                     else
@@ -248,29 +296,11 @@ namespace RafelFinalProj
                     }
 
                     loopCounter++;
-
                 }           
             }
         }
 
-        public void print()
-        {
-            string str = "";
-
-            foreach(var x in scanResults)
-            {
-                str += x.Key + "\n";
-                foreach(var s in x.Value)
-                {
-                    str += s + "\n";
-                }
-
-                str += "\n\n\n";
-            }
-            File.WriteAllText("scan1.txt", str);
-        }
-
-        private void ConvertBytesToNumber(byte[] data, string type, string fieldName)
+        private void ConvertBytesToNumber(byte[] data, string type, string fieldName, string timeTag)
         {
             if(FiltersData.isLitleEndian)
             {
@@ -308,8 +338,7 @@ namespace RafelFinalProj
                     break;
             }
 
-           scanResults[fieldName].Add(value);
-
+           scanResults[fieldName].Add(value + ";" + timeTag);
 
         }
 

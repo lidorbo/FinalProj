@@ -133,7 +133,7 @@
                         <TextBlock Margin="5,2" Text="IP To" Foreground="{StaticResource brushWatermarkForeground}" 
                        Visibility="{Binding ElementName=ipToTB, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         <TextBox Name="ipToTB" BorderBrush="{StaticResource brushWatermarkBorder}" Style="{DynamicResource RoundedTextbox}" />
-                    </Grid>                   
+                    </Grid>
                     <!--Offset TB-->
                     <Label Grid.Row="3" Grid.Column="0" Content="Offset:" HorizontalAlignment="Left" FontWeight="Bold"></Label>
                     <Grid Grid.Row="3" Grid.Column="1" Margin="5" Background="{StaticResource brushWatermarkBackground}" Style="{StaticResource EntryFieldStyle}" >
@@ -185,8 +185,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="3*"/>
                 </Grid.RowDefinitions>
-                <Button Name="startScanBTN" Grid.Row="1" Grid.Column="1" Margin="7 10" Padding="100" Content="Start Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold" Click="startScanBTN_Click"/>
-                <Button Name="stopScanBTN" Grid.Row="1" Grid.Column="2" Margin="7 10" Content="Stop Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold"/>
+                <Button Name="startScanBTN" Grid.Column="1" Margin="4,15,10,5" Padding="100" Content="Start Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold" Click="startScanBTN_Click"/>
+                <Button Name="stopScanBTN" Grid.Column="2" Margin="10,15,4,5" Content="Stop Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold"/>
             </Grid>
             <ProgressBar Name="scanProgressBar" Grid.Row="2" Height="40px" VerticalAlignment="Center" Margin="10 10" Minimum="0" Maximum="100" Value="0" Visibility="Hidden"></ProgressBar>
             <TextBlock Name="progressValue" Text="{Binding ElementName=scanProgressBar, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="-38" Visibility="Hidden"/>
