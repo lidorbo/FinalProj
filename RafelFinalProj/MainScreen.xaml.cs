@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.Linq;
+using RafelFinalProj.Properties;
 
 namespace RafelFinalProj
 {
@@ -41,10 +42,26 @@ namespace RafelFinalProj
         private const string SCAN_MSG_ERROR = "ERROR - Scan have not started!";
         private const string FIELD_MISSING_ERROR = "ERROR - One or more fields are missing.";
         private XmlParser xmlParser;
+        XmlDocument xmlFile;
+        WireSharkParse wp;
 
         public MainScreen()
         {
             InitializeComponent();
+            xmlFile = new XmlDocument();
+            wiresharkLogTB.Text = Settings.Default.wireSharkFile;
+            xmlLoadTB.Text = Settings.Default.xmlFile;
+            try
+            {
+                xmlFile.Load(xmlLoadTB.Text);
+                xmlParser = new XmlParser(this, xmlFile);
+            }
+            catch (Exception)
+            {               
+              xmlLoadTB.Text = String.Empty;
+            }
+            iniSaveTB.Text = Settings.Default.iniFile;
+            logSaveTB.Text = Settings.Default.logFile;
         }
         /// <summary>
         /// Loads the Wireshark file
@@ -87,7 +104,6 @@ namespace RafelFinalProj
                 try
                 {
                     //checks if the XML file is valid
-                    XmlDocument xmlFile = new XmlDocument();
                     xmlFile.Load(xmlFD.FileName);
                     //checks if the format is correct
                     xmlParser = new XmlParser(this, xmlFile);
@@ -180,12 +196,18 @@ namespace RafelFinalProj
                Protocol();
                IpType();
                EndianType();
+
+               Settings.Default.wireSharkFile = wiresharkLogTB.Text;
+               Settings.Default.xmlFile = xmlLoadTB.Text;
+               Settings.Default.iniFile = iniSaveTB.Text;
+               Settings.Default.logFile = logSaveTB.Text;
+               Settings.Default.Save();
                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + SCAN_MSG);
                List<FieldStructure> fieldStructure = xmlParser.GetFieldsList();
                LogWriter lw = new LogWriter(logSaveTB.Text, this, xmlLoadTB.Text, wiresharkLogTB.Text);
                if (fieldStructure != null)
                {
-                   WireSharkParse wp = new WireSharkParse(iniSaveTB.Text, wiresharkLogTB.Text, fieldStructure, this, lw);
+                   wp = new WireSharkParse(iniSaveTB.Text, wiresharkLogTB.Text, fieldStructure, this, lw);
                }
                else
                {
@@ -211,8 +233,8 @@ namespace RafelFinalProj
         private bool IsValidIP()
         {
      
-           bool ipFromParse = ValidateIPv4(ipFromTB.Text);
-           bool ipToParse = ValidateIPv4(ipToTB.Text); 
+           bool ipFromParse = ValidateIPv4(ipFromTB.Text, true);
+           bool ipToParse = ValidateIPv4(ipToTB.Text, false); 
   
            if (ipFromParse && ipToParse)
            {
@@ -237,14 +259,18 @@ namespace RafelFinalProj
         }
 
         private void Protocol()
-        {
-            if(udpRB.IsChecked.Value)
+        {         
+            if (udpRB.IsChecked.Value)
             {
-                FiltersData.isUDP = true;
+                FiltersData.protocol = "udp";
+            }
+            else if (tcpRB.IsChecked.Value)
+            {
+                FiltersData.protocol = "tcp";
             }
             else
             {
-                FiltersData.isUDP = false;
+                FiltersData.protocol = "all";
             }
         }
 
@@ -278,10 +304,18 @@ namespace RafelFinalProj
         /// </summary>
         /// <param name="ipString">The ip address</param>
         /// <returns></returns>
-        public bool ValidateIPv4(string ipString)
+        public bool ValidateIPv4(string ipString, bool isSrc)
         {
             if (String.IsNullOrWhiteSpace(ipString))
             {
+                if(isSrc)
+                {
+                    FiltersData.ipSrc = String.Empty;
+                }
+                else
+                {
+                    FiltersData.ipDest = String.Empty;
+                }
                 return true;
             }
 
@@ -326,6 +360,8 @@ namespace RafelFinalProj
         {
             if(portFromTB.Text.Length == 0 && portToTB.Text.Length == 0)
             {
+                FiltersData.portFrom = 0;
+                FiltersData.portTo = 0;
                 return true;
             }
 
@@ -414,13 +450,14 @@ namespace RafelFinalProj
         {
             if(offsetTB.Text.Length == 0)
             {
+                FiltersData.offset = 0;
                 return true;
             }
 
             try
             {
                 int offset = int.Parse(offsetTB.Text);
-                if (offset > 0)
+                if (offset >= 0)
                 {
                     FiltersData.offset = int.Parse(offsetTB.Text);
                     return true;
@@ -436,6 +473,11 @@ namespace RafelFinalProj
                
             }
 
+        }
+
+        private void stopScanBTN_Click(object sender, RoutedEventArgs e)
+        {
+            wp.worker.CancelAsync();
         }
 
 

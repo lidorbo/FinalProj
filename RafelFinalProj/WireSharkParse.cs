@@ -27,6 +27,8 @@ namespace RafelFinalProj
         Dictionary<string, List<string>> scanResults;
         private ICaptureDevice getFirstPacket;
         LogWriter logWriter;
+        public BackgroundWorker worker { set; get; }
+        DoWorkEventArgs workerEvent;
 
         public WireSharkParse(string iniPath, string wireSharkPath, List<FieldStructure> fieldsList, MainScreen mainScreen, LogWriter logWriter)
         {
@@ -41,10 +43,10 @@ namespace RafelFinalProj
             InitScanResults();
             CreateIniFile();
 
-            BackgroundWorker worker = new BackgroundWorker();
+            worker = new BackgroundWorker();
+            worker.WorkerSupportsCancellation = true;
             worker.WorkerReportsProgress = true;
             worker.DoWork += ParseWireShark;
-            worker.ProgressChanged += worker_ProgressChanged;
             worker.RunWorkerAsync();
      
         }
@@ -82,16 +84,9 @@ namespace RafelFinalProj
 
         private void GetInitTime(object sender, CaptureEventArgs e)
         {
-             string time = e.Packet.Timeval.Seconds + "." + e.Packet.Timeval.MicroSeconds;
              firstPacketTime = e.Packet.Timeval.Date.Ticks;
              getFirstPacket.OnPacketArrival -=
                                           new PacketArrivalEventHandler(GetInitTime);           
-        }
-
-        private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                    new Action(() => mainScreen.scanProgressBar.Value = (100 * e.ProgressPercentage) / (int)numOfPackets));
         }
 
         private void CalcNumberOfPackets()
@@ -148,43 +143,63 @@ namespace RafelFinalProj
 
         }
 
-        public void WriteToIniFile()
+        public void WriteToFiles()
         {
-            string str = String.Empty;
-            string timeTag = String.Empty;
             string[] temp;
+            int totalNumOfValues = 0;
+            mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                 new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ":  Writing results to files")));
+
+            mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                  new Action(() => mainScreen.scanProgressBar.Value = 0));
+
+            foreach(var packet in scanResults)
+            {
+                totalNumOfValues += packet.Value.Count;
+            }
+            numOfPackets = (ulong)totalNumOfValues;
+            totalNumOfValues = 0;
 
             foreach (var packet in scanResults)
             {
-                str += "//" + packet.Value[0] + Environment.NewLine;
-                str += "[" + packet.Key + "]" + Environment.NewLine;
+                WriteToIniFile("//" + packet.Value[0] + Environment.NewLine);
+                WriteToIniFile("[" + packet.Key + "]" + Environment.NewLine);
                 logWriter.WriteToLog("[" + packet.Key + "]" + Environment.NewLine);
 
                 for (int i = 0; i < packet.Value.Count; i++)
                 {
+                    totalNumOfValues++;
                     if(i == 0)
                     {
-                        str += "Number of entries - " + packet.Value.Count + Environment.NewLine;
+                        WriteToIniFile("Number of entries - " + (packet.Value.Count - 1) + Environment.NewLine);
                     }
                     else
                     {
                         temp = packet.Value[i].Split(';');
-                        str += temp[0] + Environment.NewLine;
-                        timeTag = temp[1];
-                        logWriter.WriteToLog(timeTag + Environment.NewLine);
+                        WriteToIniFile(temp[0] + Environment.NewLine);
+                        logWriter.WriteToLog(temp[1] + Environment.NewLine);
                     }
-               
+
+                    mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+             new Action(() => mainScreen.scanProgressBar.Value = (100 * totalNumOfValues) / (int)numOfPackets));
+
                 }
-                str += Environment.NewLine + Environment.NewLine;
+
+                WriteToIniFile(Environment.NewLine + Environment.NewLine);
                 logWriter.WriteToLog(Environment.NewLine + Environment.NewLine);
-
             }
-            logWriter.Finish();
-            byte[] data = Encoding.Unicode.GetBytes(str);
 
-            iniFile.Write(data, 0, data.Length);
+            logWriter.Finish();
             iniFile.Flush();
             iniFile.Close();
+            mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                 new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ":  Writing complete, All done!")));
+        }
+
+        public void WriteToIniFile(string str)
+        {
+            byte[] data = Encoding.Unicode.GetBytes(str);
+            iniFile.Write(data, 0, data.Length);
 
         }
 
@@ -197,8 +212,10 @@ namespace RafelFinalProj
                 wireSharkFile = new CaptureFileReaderDevice(wireSharkPath);
                 wireSharkFile.Open();
                 wireSharkFile.Filter = BuildFilterString();
-                wireSharkFile.OnPacketArrival +=
-                                          new PacketArrivalEventHandler(OnPacketArrival);
+                workerEvent = e;
+                wireSharkFile.OnPacketArrival += 
+                                          new PacketArrivalEventHandler(OnPacketArrival);              
+
                 mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
                 new Action(() => mainScreen.scanProgressBar.Visibility = System.Windows.Visibility.Visible));
 
@@ -213,13 +230,8 @@ namespace RafelFinalProj
                   new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Scan completed")));
 
                 wireSharkFile.Close();
-                WriteToIniFile();
+                WriteToFiles();
 
-                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                 new Action(() => mainScreen.scanProgressBar.Visibility = System.Windows.Visibility.Hidden));
-
-                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                 new Action(() => mainScreen.progressValue.Visibility = System.Windows.Visibility.Hidden));
             }
             catch (Exception ex)
             {
@@ -242,6 +254,12 @@ namespace RafelFinalProj
         /// </summary>
         private void OnPacketArrival(object sender, CaptureEventArgs e)
         {
+            if (this.worker.CancellationPending)
+            {
+                workerEvent.Cancel = true;
+                return;
+            }
+
             currentPacket++;
             if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet)
             {
@@ -265,7 +283,7 @@ namespace RafelFinalProj
                     }
                 }
 
-                for (int i = 0; i < packetSize; i += fieldSize)
+                for (int i = FiltersData.offset; i < packetSize; i += fieldSize)
                 {
                     if (loopCounter > fieldsList.Count - 1)
                     {
@@ -286,7 +304,7 @@ namespace RafelFinalProj
 
                         currentTimeTag = e.Packet.Timeval.Seconds + "." + e.Packet.Timeval.MicroSeconds;
                         timeDelta = e.Packet.Timeval.Date.Ticks - firstPacketTime;
-                        second = (double)timeDelta / 10000000.0;
+                        second = TimeSpan.FromTicks(timeDelta).TotalSeconds;
                         ConvertBytesToNumber(currentField, fieldsList[loopCounter].type, fieldsList[loopCounter].fieldName, second.ToString());
                         
                     }
@@ -296,6 +314,8 @@ namespace RafelFinalProj
                     }
 
                     loopCounter++;
+                    mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                            new Action(() => mainScreen.scanProgressBar.Value = (100 * currentPacket) / (int)numOfPackets));
                 }           
             }
         }
@@ -306,7 +326,6 @@ namespace RafelFinalProj
             {
                 Array.Reverse(data);
             }
-
 
             string value = string.Empty;
 
@@ -360,16 +379,12 @@ namespace RafelFinalProj
                 filter.Add(temp);
             }
 
-            if(FiltersData.isUDP)
+            if(FiltersData.protocol != "all")
             {
-                temp = "udp";           
+                temp = FiltersData.protocol + " ";
+                filter.Add(temp);
             }
-            else
-            {
-                temp = "tcp";
-            }
-            filter.Add(temp);
-
+            
             if (FiltersData.portTo != 0 && FiltersData.portTo != 0)
             {
                 temp = "portrange " + FiltersData.portFrom + "-" + FiltersData.portTo;
@@ -390,10 +405,7 @@ namespace RafelFinalProj
 
             }
                 return filterStr;
-
         }
-
-
 
     }
 }

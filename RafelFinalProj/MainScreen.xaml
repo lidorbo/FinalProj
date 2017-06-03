@@ -146,10 +146,10 @@
                         <TextBlock Margin="3,5" Text="Protocol:" TextAlignment="Left" FontWeight="Bold"></TextBlock>
                     </Grid>
                     <Grid Grid.Row="4" Grid.Column="1">
-                        <RadioButton x:Name="tcpRB" GroupName="protocol" Content="TCP" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press" IsChecked="True"/>
+                        <CheckBox x:Name="tcpRB" Content="TCP" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press" IsChecked="True"/>
                     </Grid>
                     <Grid Grid.Row="4" Grid.Column="2">
-                        <RadioButton x:Name="udpRB" GroupName="protocol" Content="UDP" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press"/>
+                        <CheckBox x:Name="udpRB" Content="UDP" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press"/>
                     </Grid>
                     <!--IP RBs-->
                     <Grid Grid.Row="5" Grid.Column="0">
@@ -186,7 +186,7 @@
                     <RowDefinition Height="3*"/>
                 </Grid.RowDefinitions>
                 <Button Name="startScanBTN" Grid.Column="1" Margin="4,15,10,5" Padding="100" Content="Start Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold" Click="startScanBTN_Click"/>
-                <Button Name="stopScanBTN" Grid.Column="2" Margin="10,15,4,5" Content="Stop Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold"/>
+                <Button Name="stopScanBTN" Grid.Column="2" Margin="10,15,4,5" Content="Stop Scan" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold" Click="stopScanBTN_Click"/>
             </Grid>
             <ProgressBar Name="scanProgressBar" Grid.Row="2" Height="40px" VerticalAlignment="Center" Margin="10 10" Minimum="0" Maximum="100" Value="0" Visibility="Hidden"></ProgressBar>
             <TextBlock Name="progressValue" Text="{Binding ElementName=scanProgressBar, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="-38" Visibility="Hidden"/>
