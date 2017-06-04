@@ -51,6 +51,9 @@ namespace RafelFinalProj
      
         }
 
+        /// <summary>
+        /// Sets the dictionary for the scan. Each field from the XML will be added as key and will have a corresponding list
+        /// </summary>
         private void InitScanResults()
         {
             scanResults = new Dictionary<string, List<string>>();       
@@ -62,6 +65,9 @@ namespace RafelFinalProj
             }
         }
 
+        /// <summary>
+        /// Will get the TICKS time of the first packet in order to determine the time tag of each packet afterwards
+        /// </summary>
         private void GetFirstPacketTime()
         {
 
@@ -72,16 +78,20 @@ namespace RafelFinalProj
                 getFirstPacket.OnPacketArrival +=
                                           new PacketArrivalEventHandler(GetInitTime);
                 getFirstPacket.Capture();
-                mainScreen.sysNotificationsLV.Items.Add("Time of first : " + firstPacketTime);
                 getFirstPacket.Close();
             }
             catch (Exception e)
             {
-                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Error " + e.Message);
+                mainScreen.WriteNotification("Error " + e.Message);
                 return;
             }
         }
 
+        /// <summary>
+        /// This event will return the TICKS time of the first packet
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void GetInitTime(object sender, CaptureEventArgs e)
         {
              firstPacketTime = e.Packet.Timeval.Date.Ticks;
@@ -89,6 +99,9 @@ namespace RafelFinalProj
                                           new PacketArrivalEventHandler(GetInitTime);           
         }
 
+        /// <summary>
+        /// Will calculate the amount of packets in the wireshark file in order to set the progress bar
+        /// </summary>
         private void CalcNumberOfPackets()
         {
             ICaptureDevice wireSharkFile;
@@ -101,18 +114,19 @@ namespace RafelFinalProj
                 wireSharkFile.OnPacketArrival +=
                                           new PacketArrivalEventHandler(totalNumberOfPackets);
                 wireSharkFile.Capture();
-                mainScreen.sysNotificationsLV.Items.Add("Number of packets: " + numOfPackets);
-
                 wireSharkFile.Close();
             }
             catch (Exception e)
             {
-                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Error " + e.Message);
+                mainScreen.WriteNotification("Error " + e.Message);
                 return;
             }
         }
 
-
+        /// <summary>
+        /// Will create the ini file. the name will be the name of the wireshark file and the date of the scan.
+        /// If a file with the same name already exists, a number will be added at the end
+        /// </summary>
         public void CreateIniFile()
         {
             string iniFileName = iniPath + "\\" + Path.GetFileNameWithoutExtension(wireSharkPath) + "_" + DateTime.Today.ToString("dd-MM-yyyy");
@@ -133,22 +147,27 @@ namespace RafelFinalProj
             }
             catch (Exception e)
             {
-                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Error " + e.Message);
+                mainScreen.WriteNotification(": Error " + e.Message);
             }
             finally
             {
-                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Create a new ini file");
+                mainScreen.WriteNotification("ini File have been created");
 
             }
 
         }
 
+        /// <summary>
+        /// Will write the results of the scan into the ini and log file in accordance to their format.
+        /// </summary>
         public void WriteToFiles()
         {
             string[] temp;
             int totalNumOfValues = 0;
-            mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                 new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ":  Writing results to files")));
+            //mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+            //     new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ":  Writing results to files")));
+
+            mainScreen.WriteNotification("Writing results to files");
 
             mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
                   new Action(() => mainScreen.scanProgressBar.Value = 0));
@@ -192,10 +211,16 @@ namespace RafelFinalProj
             logWriter.Finish();
             iniFile.Flush();
             iniFile.Close();
-            mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                 new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ":  Writing complete, All done!")));
+            //mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+            //     new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ":  Writing complete, All done!")));
+
+            mainScreen.WriteNotification("Writing complete, All done !");
         }
 
+        /// <summary>
+        /// This method will write to the ini file
+        /// </summary>
+        /// <param name="str">The string to write</param>
         public void WriteToIniFile(string str)
         {
             byte[] data = Encoding.Unicode.GetBytes(str);

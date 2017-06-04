@@ -77,7 +77,7 @@ namespace RafelFinalProj
             if (wiresharkFD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 wiresharkLogTB.Text = wiresharkFD.FileName;
-                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + WIRESHARK_LOADED);
+                WriteNotification(WIRESHARK_LOADED);
             }
             else
             {
@@ -114,8 +114,7 @@ namespace RafelFinalProj
                 {
                    statusMsg = exception.Message;
                 }
-
-                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + statusMsg);
+                WriteNotification(statusMsg);
             }
             else
             {
@@ -138,7 +137,7 @@ namespace RafelFinalProj
             }
             else
             {
-               sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + INVALID_SAVE_LOCATION_INI);
+                WriteNotification(INVALID_SAVE_LOCATION_INI);
             }
 
         }
@@ -158,7 +157,7 @@ namespace RafelFinalProj
             }
             else
             {
-                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + INVALID_SAVE_LOCATION_LOG);
+                WriteNotification(INVALID_SAVE_LOCATION_LOG);
             }
         }
 
@@ -173,12 +172,13 @@ namespace RafelFinalProj
         }
 
         /// <summary>
-        /// The method will start the scan, but beforehand, will check if all the input is correct
+        /// The method will start the scan, but beforehand, will check if all input is correct
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void startScanBTN_Click(object sender, RoutedEventArgs e)
         {
+            //checks if every field is valid
            bool ip = IsValidIP();
            bool port = IsPortValid();
            bool size = IsPacketSizeValid();
@@ -187,43 +187,49 @@ namespace RafelFinalProj
            if(wiresharkLogTB.Text.Length == 0 || xmlLoadTB.Text.Length == 0 
                || iniSaveTB.Text.Length == 0 || logSaveTB.Text.Length == 0)
            {
-               sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + FIELD_MISSING_ERROR);
+               WriteNotification(FIELD_MISSING_ERROR);
                return;
            }
 
-           if(ip && port && size && offset)
-           {
-               Protocol();
-               IpType();
-               EndianType();
 
-               Settings.Default.wireSharkFile = wiresharkLogTB.Text;
-               Settings.Default.xmlFile = xmlLoadTB.Text;
-               Settings.Default.iniFile = iniSaveTB.Text;
-               Settings.Default.logFile = logSaveTB.Text;
-               Settings.Default.Save();
-               sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + SCAN_MSG);
-               List<FieldStructure> fieldStructure = xmlParser.GetFieldsList();
-               LogWriter lw = new LogWriter(logSaveTB.Text, this, xmlLoadTB.Text, wiresharkLogTB.Text);
-               if (fieldStructure != null)
-               {
-                   wp = new WireSharkParse(iniSaveTB.Text, wiresharkLogTB.Text, fieldStructure, this, lw);
-               }
-               else
-               {
-                   //TODO - Fail Message 
-               }
+            if (ip && port && size && offset)
+            {
+                Protocol();
+                IpType();
+                EndianType();
+
+                Settings.Default.wireSharkFile = wiresharkLogTB.Text;
+                Settings.Default.xmlFile = xmlLoadTB.Text;
+                Settings.Default.iniFile = iniSaveTB.Text;
+                Settings.Default.logFile = logSaveTB.Text;
+                Settings.Default.Save();
+                WriteNotification(SCAN_MSG);
+                List<FieldStructure> fieldStructure = xmlParser.GetFieldsList();
+                LogWriter lw = new LogWriter(logSaveTB.Text, this, xmlLoadTB.Text, wiresharkLogTB.Text);
+                if (fieldStructure != null)
+                {
+                    wp = new WireSharkParse(iniSaveTB.Text, wiresharkLogTB.Text, fieldStructure, this, lw);
+                }
+                else
+                { 
+                   WriteNotification(SCAN_MSG_ERROR);
+                }
            }
            else
            {
-               sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + SCAN_MSG_ERROR);
+                WriteNotification(SCAN_MSG_ERROR);
            }
 
         }
 
+        /// <summary>
+        /// Writes notifications to the list view notifications
+        /// </summary>
+        /// <param name="str">The string to write</param>
         public void WriteNotification(string str)
         {
-            sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + str);
+            this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                new Action(() => this.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + " : " + str)));
         }
 
         /// <summary>
@@ -258,6 +264,9 @@ namespace RafelFinalProj
            return false ;
         }
 
+        /// <summary>
+        /// Will set the protocol filter to udp, tcp or both.
+        /// </summary>
         private void Protocol()
         {         
             if (udpRB.IsChecked.Value)
@@ -274,6 +283,9 @@ namespace RafelFinalProj
             }
         }
 
+        /// <summary>
+        /// Will set the IP type filter to IPv4 or IPv6.
+        /// </summary>
         private void IpType()
         {
             if (ipv4RB.IsChecked.Value)
@@ -286,7 +298,9 @@ namespace RafelFinalProj
             }
         }
 
-
+        /// <summary>
+        /// Will set the Endian type fitler to little or big.
+        /// </summary>
         private void EndianType()
         {
             if (littleRB.IsChecked.Value)
@@ -300,7 +314,7 @@ namespace RafelFinalProj
         }
 
         /// <summary>
-        /// Checks if the IP is a valid IPv4 address
+        /// Checks if the IP is a valid IP address
         /// </summary>
         /// <param name="ipString">The ip address</param>
         /// <returns></returns>
@@ -377,16 +391,16 @@ namespace RafelFinalProj
                         FiltersData.portTo = ushort.Parse(portToTB.Text);
                         return true;
                     }
-                    sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PORT_MSG_ERROR);
+                    WriteNotification(PORT_MSG_ERROR);
                     return false;
 
                 }
-                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PORT_RANGE_MSG_ERROR);
+                WriteNotification(PORT_RANGE_MSG_ERROR);
                 return false;
             }
             catch (Exception)
             {
-                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PORT_MSG_ERROR);
+                WriteNotification(PORT_MSG_ERROR);
                 return false;
             }
          
@@ -418,15 +432,15 @@ namespace RafelFinalProj
                         FiltersData.packetSizeTo = int.Parse(packetSizeToTB.Text);
                         return true;
                     }
-                    sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PACKET_MSG_ERROR);
+                    WriteNotification(PACKET_MSG_ERROR);
                     return false;
                 }
-                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PACKET_SIZE_RANGE_ERROR);
+                WriteNotification(PACKET_SIZE_RANGE_ERROR);
                 return false;
             }
             catch (Exception)
             {          
-               sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + PACKET_MSG_ERROR);
+                WriteNotification(PACKET_MSG_ERROR);
                return false;
             }
         }
@@ -463,18 +477,23 @@ namespace RafelFinalProj
                     return true;
                 }
 
-                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + OFFSET_MSG_ERROR);
+                WriteNotification(OFFSET_MSG_ERROR);
                 return false;
             }
             catch (Exception)
             {
-                sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + OFFSET_MSG_ERROR);
+                WriteNotification(OFFSET_MSG_ERROR);
                 return false;
                
             }
 
         }
 
+        /// <summary>
+        /// Will stop the ongoing scan
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void stopScanBTN_Click(object sender, RoutedEventArgs e)
         {
             wp.worker.CancelAsync();
