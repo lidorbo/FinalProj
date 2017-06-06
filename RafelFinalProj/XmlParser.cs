@@ -10,7 +10,6 @@ namespace RafelFinalProj
 {
     class XmlParser
     {
-        private const string FIELD = "FIELD";
 
         private MainScreen mainScreen;
         private XmlDocument xmlFile;
@@ -24,9 +23,12 @@ namespace RafelFinalProj
             this.xmlFile = xmlFile;
             fieldsList = new List<FieldStructure>();
             InitSizeOfDictionary();
-          //  ParseXml();
         }
 
+        /// <summary>
+        /// Returns the fields list
+        /// </summary>
+        /// <returns></returns>
         public List<FieldStructure> GetFieldsList()
         {
             if(ParseXml())
@@ -38,7 +40,7 @@ namespace RafelFinalProj
         }
 
         /// <summary>
-        /// This method will validate the format of the XML file according to a specific format
+        /// This method will validate the format of the XML file according to the requested format
         /// <Message> //the name of the message is irrelevant
         /// <Field#></Field#> //in an even position
         /// <Field#S></Field#S> //in an odd position
@@ -47,8 +49,8 @@ namespace RafelFinalProj
         /// <returns>true if the format is valid</returns>
         private bool ParseXml()
         {
-            string fieldName = "";
-            string keyValue = "";
+            string fieldName = String.Empty;
+            string keyValue = String.Empty;
             int typeSize = 0;
             XmlElement root = xmlFile.DocumentElement;
             XmlNodeList elements = root.ChildNodes;
@@ -59,34 +61,31 @@ namespace RafelFinalProj
             for (int i = 0; i < elements.Count; i++)
             {
                 fieldName = elements[i].Name.ToUpper();
-                if (fieldName.StartsWith(FIELD))
+                if (fieldName.StartsWith(ConstValues.XML_FIELD_NAME))
                 {
-                    string checkDigits = fieldName.TrimStart(FIELD.ToCharArray());
+                    string checkDigits = fieldName.TrimStart(ConstValues.XML_FIELD_NAME.ToCharArray());
                     if (i % 2 == 0)
                     {
                         if (IsDigitsOnly(checkDigits))
                         {
-                            mainScreen.sysNotificationsLV.Items.Add(fieldName + " " + elements[i].InnerText);
                             keyValue = elements[i].InnerText;
                             fs.fieldName = keyValue;
-                            //xmlStructure.Add(keyValue, 0);
                         }
                         else
                         {
-                            mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Field name " + elements[i].Name + " should end with a number");
+                            mainScreen.WriteNotification(ConstValues.XML_END_WITH_NUMBER_ERROR + elements[i].Name);
                             return false;
                         }
                     }
                     else
                     {
-                        if (checkDigits[checkDigits.Length - 1] == 'S' && IsDigitsOnly(checkDigits.Substring(0, checkDigits.Length - 1)))
+                        if (checkDigits[checkDigits.Length - 1] == ConstValues.FIELD_TYPE_SUFFIX && IsDigitsOnly(checkDigits.Substring(0, checkDigits.Length - 1)))
                         {
-                            mainScreen.sysNotificationsLV.Items.Add(fieldName + " " + elements[i].InnerText);
                             typeSize = ConvertTypeToInt(elements[i].InnerText, fs);
 
                             if (typeSize == 0)
                             {
-                                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Invalid type " + elements[i].InnerText);
+                                mainScreen.WriteNotification(ConstValues.XML_INVALID_TYPE_ERROR + elements[i].InnerText);
                                 return false;
                             }
 
@@ -97,7 +96,7 @@ namespace RafelFinalProj
                         }
                         else
                         {
-                            mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Field name " + elements[i].Name + " should have a number and S at the end");
+                            mainScreen.WriteNotification(ConstValues.XML_NUMBER_AND_S_ERROR + elements[i].Name);
                             return false;
                         }
                     }
@@ -106,21 +105,10 @@ namespace RafelFinalProj
                 }
                 else
                 {
-                    mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Field name " + elements[i].Name + " is invalid.");
+                    mainScreen.WriteNotification(ConstValues.XML_INVALID_FIELD_NAME_ERROR + elements[i].Name);
                     return false;
                 }
             }
-
-            string str = "";
-
-            foreach (var e in fieldsList)
-            {
-                str += "Test "+ e.fieldName + " " + e.size + " " + e.type + "\n" ;
-            }
-
-            mainScreen.sysNotificationsLV.Items.Add(str);
-            mainScreen.sysNotificationsLV.Items.Add("count = "+fieldsList.Count);
-
 
             return true;
         }
@@ -134,7 +122,8 @@ namespace RafelFinalProj
         {
             foreach (char c in str)
             {
-                if (c < '0' || c > '9')
+                
+                if (c < ConstValues.ZERO_CHAR || c > ConstValues.NINE_CHAR)
                     return false;
             }
 
@@ -150,20 +139,18 @@ namespace RafelFinalProj
             sizeOfTypes = new Dictionary<string, int>();
 
             //Signed
-            sizeOfTypes.Add("char", 1);
-            sizeOfTypes.Add("short", 2);
-            sizeOfTypes.Add("int32", 4);
-            sizeOfTypes.Add("int64", 8);
-            sizeOfTypes.Add("long", 16);
+            sizeOfTypes.Add(ConstValues.CHAR, 1);
+            sizeOfTypes.Add(ConstValues.SHORT, 2);
+            sizeOfTypes.Add(ConstValues.INT32, 4);
+            sizeOfTypes.Add(ConstValues.INT64, 8);
+            sizeOfTypes.Add(ConstValues.LONG, 16);
 
             //Unsigned
-            sizeOfTypes.Add("Uchar", 1);
-            sizeOfTypes.Add("Ushort", 2);
-            sizeOfTypes.Add("Uint32", 4);
-            sizeOfTypes.Add("Uint64", 8);
-            sizeOfTypes.Add("Ulong", 16);
-
-
+            sizeOfTypes.Add(ConstValues.UCHAR, 1);
+            sizeOfTypes.Add(ConstValues.USHORT, 2);
+            sizeOfTypes.Add(ConstValues.UINT32, 4);
+            sizeOfTypes.Add(ConstValues.UINT64, 8);
+            sizeOfTypes.Add(ConstValues.ULONG, 16);
         }
 
         /// <summary>

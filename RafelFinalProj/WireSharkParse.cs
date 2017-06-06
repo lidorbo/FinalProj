@@ -76,13 +76,13 @@ namespace RafelFinalProj
                 getFirstPacket = new CaptureFileReaderDevice(wireSharkPath);
                 getFirstPacket.Open();
                 getFirstPacket.OnPacketArrival +=
-                                          new PacketArrivalEventHandler(GetInitTime);
+                                          new PacketArrivalEventHandler(GetInitTime);//sets the event to capture the first packet
                 getFirstPacket.Capture();
                 getFirstPacket.Close();
             }
             catch (Exception e)
             {
-                mainScreen.WriteNotification("Error " + e.Message);
+                mainScreen.WriteNotification(ConstValues.WIRESHARK_PARSE_ERROR + e.Message);
                 return;
             }
         }
@@ -96,7 +96,7 @@ namespace RafelFinalProj
         {
              firstPacketTime = e.Packet.Timeval.Date.Ticks;
              getFirstPacket.OnPacketArrival -=
-                                          new PacketArrivalEventHandler(GetInitTime);           
+                                          new PacketArrivalEventHandler(GetInitTime);//canceling the event after we got the time tick         
         }
 
         /// <summary>
@@ -118,41 +118,40 @@ namespace RafelFinalProj
             }
             catch (Exception e)
             {
-                mainScreen.WriteNotification("Error " + e.Message);
+                mainScreen.WriteNotification(ConstValues.WIRESHARK_PARSE_ERROR + e.Message);
                 return;
             }
         }
 
         /// <summary>
-        /// Will create the ini file. the name will be the name of the wireshark file and the date of the scan.
+        /// Will create the ini file. The name will be: (Wireshark file)_(date).ini
         /// If a file with the same name already exists, a number will be added at the end
         /// </summary>
         public void CreateIniFile()
         {
-            string iniFileName = iniPath + "\\" + Path.GetFileNameWithoutExtension(wireSharkPath) + "_" + DateTime.Today.ToString("dd-MM-yyyy");
+            string iniFileName = iniPath + "\\" + Path.GetFileNameWithoutExtension(wireSharkPath) + ConstValues.FILENAME_SEPERATOR + DateTime.Today.ToString(ConstValues.DATE_FORMAT);
             try
             {
-                iniFile = new FileStream(iniFileName +".ini", FileMode.CreateNew);
+                iniFile = new FileStream(iniFileName + ConstValues.RESULTS_FILE_EXTENTION , FileMode.CreateNew);
             }
             catch(IOException ex)
             {
                 int count = 0;
 
-                while (File.Exists(iniFileName + "_" + count + ".ini"))
+                while (File.Exists(iniFileName + ConstValues.FILENAME_SEPERATOR + count + ConstValues.RESULTS_FILE_EXTENTION))
                 {
                     count++;
                 }
 
-                iniFile = new FileStream(iniFileName + "_" + count + ".ini", FileMode.CreateNew);
+                iniFile = new FileStream(iniFileName + ConstValues.FILENAME_SEPERATOR + count + ConstValues.RESULTS_FILE_EXTENTION, FileMode.CreateNew);
             }
             catch (Exception e)
             {
-                mainScreen.WriteNotification(": Error " + e.Message);
+                mainScreen.WriteNotification(ConstValues.INI_FILE_ERROR + e.Message);
             }
             finally
             {
-                mainScreen.WriteNotification("ini File have been created");
-
+                mainScreen.WriteNotification(ConstValues.INI_FILE_CREATED);
             }
 
         }
@@ -164,18 +163,17 @@ namespace RafelFinalProj
         {
             string[] temp;
             int totalNumOfValues = 0;
-            //mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-            //     new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ":  Writing results to files")));
 
-            mainScreen.WriteNotification("Writing results to files");
+            mainScreen.WriteNotification(ConstValues.WRITING_TO_FILES);
 
-            mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                  new Action(() => mainScreen.scanProgressBar.Value = 0));
-
+            //resets the progress bar
+            mainScreen.ShowAndSetProgressBar();
+         
             foreach(var packet in scanResults)
             {
                 totalNumOfValues += packet.Value.Count;
             }
+
             numOfPackets = (ulong)totalNumOfValues;
             totalNumOfValues = 0;
 
@@ -194,14 +192,12 @@ namespace RafelFinalProj
                     }
                     else
                     {
-                        temp = packet.Value[i].Split(';');
+                        temp = packet.Value[i].Split(ConstValues.VALUE_TIMETAG_SEPERATOR);
                         WriteToIniFile(temp[0] + Environment.NewLine);
                         logWriter.WriteToLog(temp[1] + Environment.NewLine);
                     }
 
-                    mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-             new Action(() => mainScreen.scanProgressBar.Value = (100 * totalNumOfValues) / (int)numOfPackets));
-
+                    mainScreen.ProgressBarReportProgress(totalNumOfValues, numOfPackets);
                 }
 
                 WriteToIniFile(Environment.NewLine + Environment.NewLine);
@@ -211,10 +207,8 @@ namespace RafelFinalProj
             logWriter.Finish();
             iniFile.Flush();
             iniFile.Close();
-            //mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-            //     new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ":  Writing complete, All done!")));
 
-            mainScreen.WriteNotification("Writing complete, All done !");
+            mainScreen.WriteNotification(ConstValues.WRITING_COMPLETE);
         }
 
         /// <summary>
@@ -228,6 +222,11 @@ namespace RafelFinalProj
 
         }
 
+        /// <summary>
+        /// Will start to parse the Wireshark file
+        /// </summary>
+        /// <param name="senderProgress"></param>
+        /// <param name="e"></param>
         public void ParseWireShark(object senderProgress, DoWorkEventArgs e)
         {
             ICaptureDevice wireSharkFile;
@@ -236,38 +235,34 @@ namespace RafelFinalProj
             {
                 wireSharkFile = new CaptureFileReaderDevice(wireSharkPath);
                 wireSharkFile.Open();
-                wireSharkFile.Filter = BuildFilterString();
+                wireSharkFile.Filter = BuildFilterString();//sets the filters
                 workerEvent = e;
                 wireSharkFile.OnPacketArrival += 
-                                          new PacketArrivalEventHandler(OnPacketArrival);              
+                                          new PacketArrivalEventHandler(OnPacketArrival);
 
-                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                new Action(() => mainScreen.scanProgressBar.Visibility = System.Windows.Visibility.Visible));
-
-                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                 new Action(() => mainScreen.progressValue.Visibility = System.Windows.Visibility.Visible));
-
-                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                    new Action(() => mainScreen.sysNotificationsLV.Items.Add("Scanning")));
-
+                mainScreen.ShowAndSetProgressBar();
+                mainScreen.WriteNotification(ConstValues.SCANNING_WIRESHARK_FILE);
                 wireSharkFile.Capture();
-                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                  new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Scan completed")));
-
+                mainScreen.WriteNotification(ConstValues.SCANNING_WIRESHARK_COMPLETED);
                 wireSharkFile.Close();
                 WriteToFiles();
+                mainScreen.HideProgressBar();
 
             }
             catch (Exception ex)
             {
-                mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                   new Action(() => mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Error " + ex.Message)));
+                mainScreen.WriteNotification(ConstValues.WIRESHARK_PARSE_ERROR + ex.Message);
                 return;
             }
 
 
         }
 
+        /// <summary>
+        /// Sets the total number of packets. Will be used to report progress to the progress bar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void totalNumberOfPackets(object sender, CaptureEventArgs e)
         {
             ++numOfPackets;
@@ -275,10 +270,11 @@ namespace RafelFinalProj
 
        
         /// <summary>
-        /// Prints the source and dest MAC addresses of each received Ethernet frame
+        /// Scans a packet and parse it's results
         /// </summary>
         private void OnPacketArrival(object sender, CaptureEventArgs e)
         {
+            //checks if the scan was cancelled
             if (this.worker.CancellationPending)
             {
                 workerEvent.Cancel = true;
@@ -296,10 +292,10 @@ namespace RafelFinalProj
                 byte[] packetData = ethernetPacket.PayloadPacket.PayloadPacket.PayloadData;
                 byte[] currentField;
                 int tempIndex = 0;
-                string currentTimeTag = null;
                 long timeDelta;
-                double second;
+                double ticks;
 
+                //checks the size filter
                 if (FiltersData.packetSizeFrom != -1 && FiltersData.packetSizeTo != -1)
                 {
                     if(packetSize < FiltersData.packetSizeFrom || packetSize > FiltersData.packetSizeTo)
@@ -308,8 +304,10 @@ namespace RafelFinalProj
                     }
                 }
 
+                //copies the current data according to the field's size
                 for (int i = FiltersData.offset; i < packetSize; i += fieldSize)
                 {
+                    //checks if there are any other fields to scan
                     if (loopCounter > fieldsList.Count - 1)
                     {
                         break;
@@ -327,10 +325,9 @@ namespace RafelFinalProj
                             tempIndex++;
                         }
 
-                        currentTimeTag = e.Packet.Timeval.Seconds + "." + e.Packet.Timeval.MicroSeconds;
                         timeDelta = e.Packet.Timeval.Date.Ticks - firstPacketTime;
-                        second = TimeSpan.FromTicks(timeDelta).TotalSeconds;
-                        ConvertBytesToNumber(currentField, fieldsList[loopCounter].type, fieldsList[loopCounter].fieldName, second.ToString());
+                        ticks = TimeSpan.FromTicks(timeDelta).TotalSeconds;
+                        ConvertBytesToNumber(currentField, fieldsList[loopCounter].type, fieldsList[loopCounter].fieldName, ticks.ToString());
                         
                     }
                     else
@@ -339,14 +336,21 @@ namespace RafelFinalProj
                     }
 
                     loopCounter++;
-                    mainScreen.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                            new Action(() => mainScreen.scanProgressBar.Value = (100 * currentPacket) / (int)numOfPackets));
+                    mainScreen.ProgressBarReportProgress(currentPacket, numOfPackets);
                 }           
             }
         }
 
+        /// <summary>
+        /// Will convert the bytes array to a value according to its type
+        /// </summary>
+        /// <param name="data">the byte array</param>
+        /// <param name="type">the type of the field</param>
+        /// <param name="fieldName">the name of the field</param>
+        /// <param name="timeTag">the current timetag</param>
         private void ConvertBytesToNumber(byte[] data, string type, string fieldName, string timeTag)
         {
+            //little endian should be read in reverse
             if(FiltersData.isLitleEndian)
             {
                 Array.Reverse(data);
@@ -382,37 +386,41 @@ namespace RafelFinalProj
                     break;
             }
 
-           scanResults[fieldName].Add(value + ";" + timeTag);
+           scanResults[fieldName].Add(value + ConstValues.VALUE_TIMETAG_SEPERATOR + timeTag);
 
         }
 
+        /// <summary>
+        /// Sets the filters to the scan in pcap format
+        /// </summary>
+        /// <returns></returns>
         public string BuildFilterString()
         {
-            string filterStr = "";
-            string temp = "";
+            string filterStr = String.Empty;
+            string temp = String.Empty;
             List<string> filter = new List<string>();
 
             if(FiltersData.ipSrc != string.Empty)
             {
-                temp = "src " + FiltersData.ipSrc;
+                temp = ConstValues.PCAP_SRC + FiltersData.ipSrc;
                 filter.Add(temp);
             }
 
             if (FiltersData.ipDest != string.Empty)
             {
-                temp = "dst " + FiltersData.ipDest;
+                temp = ConstValues.PCAP_DST + FiltersData.ipDest;
                 filter.Add(temp);
             }
 
-            if(FiltersData.protocol != "all")
+            if(FiltersData.protocol != ConstValues.ALL_STR)
             {
-                temp = FiltersData.protocol + " ";
+                temp = FiltersData.protocol + ConstValues.STRING_WHITESPACE;
                 filter.Add(temp);
             }
             
             if (FiltersData.portTo != 0 && FiltersData.portTo != 0)
             {
-                temp = "portrange " + FiltersData.portFrom + "-" + FiltersData.portTo;
+                temp = ConstValues.PCAP_PORT_RANGE + FiltersData.portFrom + ConstValues.PCAP_PORT_RANGE_SEPERATOR + FiltersData.portTo;
                 filter.Add(temp);
             }
 
@@ -420,7 +428,7 @@ namespace RafelFinalProj
             {
                 if(i != 0 && i != filter.Count -1)
                 {
-                    filterStr += filter[i] + " and";
+                    filterStr += filter[i] + ConstValues.PCAP_AND;
                 }
 
                 else

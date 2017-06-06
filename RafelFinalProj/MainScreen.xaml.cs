@@ -25,22 +25,7 @@ namespace RafelFinalProj
     /// </summary>
     public partial class MainScreen : Window
     {
-        private const string WIRESHARK_LOADED = "Wireshark file loaded";
-        private const string WIRESHARK_ERROR = "Wireshark file can't be loaded";
-        private const string XML_LOADED = "XML file loaded";
-        private const string INVALID_SAVE_LOCATION_INI = "Invalid save path for ini";
-        private const string INVALID_SAVE_LOCATION_LOG = "Invalid save path for log";
-        private const int MAX_PORT = 65535;
 
-        private const string IP_MSG_ERROR = "One or more IPs are not valid";
-        private const string PORT_MSG_ERROR = "Port is not valid";
-        private const string PORT_RANGE_MSG_ERROR = "Port range is not valid";
-        private const string PACKET_MSG_ERROR = "One or packet sizes are not valid";
-        private const string PACKET_SIZE_RANGE_ERROR = "Packet size range is not valid";
-        private const string OFFSET_MSG_ERROR = "Offset must be bigger than 0";
-        private const string SCAN_MSG = "Scan have started";
-        private const string SCAN_MSG_ERROR = "ERROR - Scan have not started!";
-        private const string FIELD_MISSING_ERROR = "ERROR - One or more fields are missing.";
         private XmlParser xmlParser;
         XmlDocument xmlFile;
         WireSharkParse wp;
@@ -77,7 +62,7 @@ namespace RafelFinalProj
             if (wiresharkFD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 wiresharkLogTB.Text = wiresharkFD.FileName;
-                WriteNotification(WIRESHARK_LOADED);
+                WriteNotification(ConstValues.WIRESHARK_LOADED);
             }
             else
             {
@@ -100,7 +85,7 @@ namespace RafelFinalProj
 
             if (xmlFD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                string statusMsg = XML_LOADED;
+                string statusMsg = ConstValues.XML_LOADED;
                 try
                 {
                     //checks if the XML file is valid
@@ -137,7 +122,7 @@ namespace RafelFinalProj
             }
             else
             {
-                WriteNotification(INVALID_SAVE_LOCATION_INI);
+                WriteNotification(ConstValues.INVALID_SAVE_LOCATION_INI);
             }
 
         }
@@ -157,7 +142,7 @@ namespace RafelFinalProj
             }
             else
             {
-                WriteNotification(INVALID_SAVE_LOCATION_LOG);
+                WriteNotification(ConstValues.INVALID_SAVE_LOCATION_LOG);
             }
         }
 
@@ -187,7 +172,7 @@ namespace RafelFinalProj
            if(wiresharkLogTB.Text.Length == 0 || xmlLoadTB.Text.Length == 0 
                || iniSaveTB.Text.Length == 0 || logSaveTB.Text.Length == 0)
            {
-               WriteNotification(FIELD_MISSING_ERROR);
+               WriteNotification(ConstValues.FIELD_MISSING_ERROR);
                return;
            }
 
@@ -203,7 +188,7 @@ namespace RafelFinalProj
                 Settings.Default.iniFile = iniSaveTB.Text;
                 Settings.Default.logFile = logSaveTB.Text;
                 Settings.Default.Save();
-                WriteNotification(SCAN_MSG);
+                WriteNotification(ConstValues.SCAN_MSG);
                 List<FieldStructure> fieldStructure = xmlParser.GetFieldsList();
                 LogWriter lw = new LogWriter(logSaveTB.Text, this, xmlLoadTB.Text, wiresharkLogTB.Text);
                 if (fieldStructure != null)
@@ -212,12 +197,12 @@ namespace RafelFinalProj
                 }
                 else
                 { 
-                   WriteNotification(SCAN_MSG_ERROR);
+                   WriteNotification(ConstValues.SCAN_MSG_ERROR);
                 }
            }
            else
            {
-                WriteNotification(SCAN_MSG_ERROR);
+                WriteNotification(ConstValues.SCAN_MSG_ERROR);
            }
 
         }
@@ -229,8 +214,41 @@ namespace RafelFinalProj
         public void WriteNotification(string str)
         {
             this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                new Action(() => this.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + " : " + str)));
+                new Action(() => this.sysNotificationsLV.Items.Add(DateTime.Now.ToString(ConstValues.TIME_FORMAT) + " : " + str)));
         }
+
+     
+        /// <summary>
+        /// Restes the progress bar and shows it.
+        /// </summary>
+        public void ShowAndSetProgressBar()
+        {
+            this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                 new Action(() => this.scanProgressBar.Visibility = System.Windows.Visibility.Visible));
+
+            this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+             new Action(() => this.progressValue.Visibility = System.Windows.Visibility.Visible));
+
+            this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+               new Action(() => this.scanProgressBar.Value = 0));
+
+        }
+
+        public void ProgressBarReportProgress(int currentValue, ulong total)
+        {
+            this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+             new Action(() => this.scanProgressBar.Value = (100 * currentValue) / (int)total));
+        }
+
+        public void HideProgressBar()
+        {
+            this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                 new Action(() => this.scanProgressBar.Visibility = System.Windows.Visibility.Hidden));
+
+            this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+             new Action(() => this.progressValue.Visibility = System.Windows.Visibility.Hidden));
+        }
+
 
         /// <summary>
         /// Checks if the inserted IPs are vaild and have a correct range. Will use the methods ValidateIP and IsValidIpRange.
@@ -260,7 +278,7 @@ namespace RafelFinalProj
                FiltersData.ipDest = ipToTB.Text;
                return true;
            }
-           sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + IP_MSG_ERROR);
+           sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + ConstValues.IP_MSG_ERROR);
            return false ;
         }
 
@@ -271,15 +289,15 @@ namespace RafelFinalProj
         {         
             if (udpRB.IsChecked.Value)
             {
-                FiltersData.protocol = "udp";
+                FiltersData.protocol = ConstValues.UDP_STR;
             }
             else if (tcpRB.IsChecked.Value)
             {
-                FiltersData.protocol = "tcp";
+                FiltersData.protocol = ConstValues.TCP_STR;
             }
             else
             {
-                FiltersData.protocol = "all";
+                FiltersData.protocol = ConstValues.ALL_STR;
             }
         }
 
@@ -333,7 +351,7 @@ namespace RafelFinalProj
                 return true;
             }
 
-            string[] splitValues = ipString.Split('.');
+            string[] splitValues = ipString.Split(ConstValues.IPV4_SEPERATOR);
             if (splitValues.Length != 4)
             {
                 return false;
@@ -351,8 +369,8 @@ namespace RafelFinalProj
         public bool IsValidIpRange()
         {
             //each element in the array will contain a number between 0-255
-            string[] splitIpTo = ipToTB.Text.Split('.');
-            string[] splitIpFrom = ipFromTB.Text.Split('.');
+            string[] splitIpTo = ipToTB.Text.Split(ConstValues.IPV4_SEPERATOR);
+            string[] splitIpFrom = ipFromTB.Text.Split(ConstValues.IPV4_SEPERATOR);
 
             for(int i =0; i < splitIpTo.Length; i++)
             {
@@ -385,22 +403,22 @@ namespace RafelFinalProj
                 int portTo = int.Parse(portToTB.Text);
                 if (IsRangeValid(portFrom, portTo))
                 {
-                    if ((portFrom < MAX_PORT) && (portTo < MAX_PORT) && (portFrom > 0) && (portTo > 0))
+                    if ((portFrom < ConstValues.MAX_PORT) && (portTo < ConstValues.MAX_PORT) && (portFrom > 0) && (portTo > 0))
                     {
                         FiltersData.portFrom = ushort.Parse(portFromTB.Text);
                         FiltersData.portTo = ushort.Parse(portToTB.Text);
                         return true;
                     }
-                    WriteNotification(PORT_MSG_ERROR);
+                    WriteNotification(ConstValues.PORT_MSG_ERROR);
                     return false;
 
                 }
-                WriteNotification(PORT_RANGE_MSG_ERROR);
+                WriteNotification(ConstValues.PORT_RANGE_MSG_ERROR);
                 return false;
             }
             catch (Exception)
             {
-                WriteNotification(PORT_MSG_ERROR);
+                WriteNotification(ConstValues.PORT_MSG_ERROR);
                 return false;
             }
          
@@ -432,15 +450,15 @@ namespace RafelFinalProj
                         FiltersData.packetSizeTo = int.Parse(packetSizeToTB.Text);
                         return true;
                     }
-                    WriteNotification(PACKET_MSG_ERROR);
+                    WriteNotification(ConstValues.PACKET_MSG_ERROR);
                     return false;
                 }
-                WriteNotification(PACKET_SIZE_RANGE_ERROR);
+                WriteNotification(ConstValues.PACKET_SIZE_RANGE_ERROR);
                 return false;
             }
             catch (Exception)
             {          
-                WriteNotification(PACKET_MSG_ERROR);
+                WriteNotification(ConstValues.PACKET_MSG_ERROR);
                return false;
             }
         }
@@ -477,12 +495,12 @@ namespace RafelFinalProj
                     return true;
                 }
 
-                WriteNotification(OFFSET_MSG_ERROR);
+                WriteNotification(ConstValues.OFFSET_MSG_ERROR);
                 return false;
             }
             catch (Exception)
             {
-                WriteNotification(OFFSET_MSG_ERROR);
+                WriteNotification(ConstValues.OFFSET_MSG_ERROR);
                 return false;
                
             }

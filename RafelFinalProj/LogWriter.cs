@@ -23,34 +23,38 @@ namespace RafelFinalProj
             CreateLogFile();
         }
 
+        /// <summary>
+        /// Creates the log file. The name will be: LOG_FILE_(Date)_(ini file name).txt
+        /// If there's a file with the same name, a number will be added at the end.
+        /// </summary>
         public void CreateLogFile()
         {
-            string iniFileName = logFilePath + "\\LOG_FILE " + DateTime.Today.ToString("dd-MM-yyyy");
+            string iniFileName = logFilePath + ConstValues.LOG_FILE_NAME + DateTime.Today.ToString(ConstValues.DATE_FORMAT);
             try
             {
-                logFS = new FileStream(iniFileName + ".txt", FileMode.CreateNew);
+                logFS = new FileStream(iniFileName + ConstValues.LOG_FILE_EXTENTION, FileMode.CreateNew);
             }
             catch (IOException ex)
             {
                 int count = 0;
 
-                while (File.Exists(iniFileName + "_" + count + ".txt"))
+                while (File.Exists(iniFileName + ConstValues.FILENAME_SEPERATOR + count + ConstValues.LOG_FILE_EXTENTION))
                 {
                     count++;
                 }
 
-                logFS = new FileStream(iniFileName + "_" + count + ".txt", FileMode.CreateNew);
+                logFS = new FileStream(iniFileName + ConstValues.FILENAME_SEPERATOR + count + ConstValues.LOG_FILE_EXTENTION, FileMode.CreateNew);
             }
             catch (Exception e)
             {
-                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Error " + e.Message);
+                mainScreen.WriteNotification(ConstValues.LOG_ERROR + e.Message);
                 return;
             }
             finally
             {
-                mainScreen.sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": Create a new Log file");
-                string title = "Scan Date - " + DateTime.Today.ToString("dd-MM-yyyy") + Environment.NewLine 
-                             + "Scan Time - " + DateTime.Now.ToString("HH:mm") + Environment.NewLine
+                mainScreen.WriteNotification(ConstValues.LOG_CREATED);
+                string title = "Scan Date - " + DateTime.Today.ToString(ConstValues.DATE_FORMAT) + Environment.NewLine 
+                             + "Scan Time - " + DateTime.Now.ToString(ConstValues.TIME_FORMAT) + Environment.NewLine
                              + "Xml File Name - " + xmlFileName + Environment.NewLine
                              + "WireShark File Name - " + wireSharkFile + Environment.NewLine + Environment.NewLine 
                              + Environment.NewLine;
@@ -59,12 +63,19 @@ namespace RafelFinalProj
 
         }
 
+        /// <summary>
+        /// Writes a string to the log file
+        /// </summary>
+        /// <param name="str">The string to write</param>
         public void WriteToLog(string str)
         {
             byte[] data = Encoding.UTF8.GetBytes(str);
             logFS.Write(data, 0, data.Length);
         }
 
+        /// <summary>
+        /// Closes the log file
+        /// </summary>
         public void Finish()
         {
             logFS.Flush();
