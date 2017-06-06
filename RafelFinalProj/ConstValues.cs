@@ -30,6 +30,7 @@ namespace RafelFinalProj
 
         #region Chars
         public const char IPV4_SEPERATOR = '.';
+        public const char IPV6_SEPERATOR = ':';
         public const char FIELD_TYPE_SUFFIX = 'S';
         public const char VALUE_TIMETAG_SEPERATOR = ';';
         public const char ZERO_CHAR = '0';
@@ -81,7 +82,7 @@ namespace RafelFinalProj
         #region PCAP
         public const string PCAP_DST = "dst ";
         public const string PCAP_SRC = "src ";
-        public const string PCAP_AND = " and";
+        public const string PCAP_AND = " and ";
         public const string PCAP_PORT_RANGE = "portrange ";
         public const string PCAP_PORT_RANGE_SEPERATOR = "-";
         #endregion

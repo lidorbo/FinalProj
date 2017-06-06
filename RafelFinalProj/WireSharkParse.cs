@@ -41,7 +41,6 @@ namespace RafelFinalProj
             CalcNumberOfPackets();
             keyStr = new List<string>();
             InitScanResults();
-            CreateIniFile();
 
             worker = new BackgroundWorker();
             worker.WorkerSupportsCancellation = true;
@@ -163,6 +162,7 @@ namespace RafelFinalProj
         {
             string[] temp;
             int totalNumOfValues = 0;
+            CreateIniFile();
 
             mainScreen.WriteNotification(ConstValues.WRITING_TO_FILES);
 
@@ -426,7 +426,7 @@ namespace RafelFinalProj
 
             for (int i = 0; i < filter.Count; i++ )
             {
-                if(i != 0 && i != filter.Count -1)
+                if(i != filter.Count -1)
                 {
                     filterStr += filter[i] + ConstValues.PCAP_AND;
                 }

@@ -166,10 +166,10 @@
                         <TextBlock Margin="3,5" Text="Endian Format:" TextAlignment="Left" FontWeight="Bold"></TextBlock>
                     </Grid>
                     <Grid Grid.Row="6" Grid.Column="1">
-                        <RadioButton x:Name="littleRB" GroupName="endian" Content="Little Endian" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press" IsChecked="True"/>
+                        <RadioButton x:Name="littleRB" GroupName="endian" Content="Little Endian" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press"/>
                     </Grid>
                     <Grid Grid.Row="6" Grid.Column="2">
-                        <RadioButton x:Name="bigRB" GroupName="endian" Content="Big Endian" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press"/>
+                        <RadioButton x:Name="bigRB" GroupName="endian" Content="Big Endian" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press" IsChecked="True"/>
                     </Grid>
                 </Grid>
             </StackPanel>

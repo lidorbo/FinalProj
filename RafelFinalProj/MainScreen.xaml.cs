@@ -163,6 +163,11 @@ namespace RafelFinalProj
         /// <param name="e"></param>
         private void startScanBTN_Click(object sender, RoutedEventArgs e)
         {
+
+           Protocol();
+           IpType();
+           EndianType();
+           
             //checks if every field is valid
            bool ip = IsValidIP();
            bool port = IsPortValid();
@@ -179,9 +184,7 @@ namespace RafelFinalProj
 
             if (ip && port && size && offset)
             {
-                Protocol();
-                IpType();
-                EndianType();
+                
 
                 Settings.Default.wireSharkFile = wiresharkLogTB.Text;
                 Settings.Default.xmlFile = xmlLoadTB.Text;
@@ -256,9 +259,20 @@ namespace RafelFinalProj
         /// <returns></returns>
         private bool IsValidIP()
         {
-     
-           bool ipFromParse = ValidateIPv4(ipFromTB.Text, true);
-           bool ipToParse = ValidateIPv4(ipToTB.Text, false); 
+
+            bool ipFromParse;
+            bool ipToParse;
+            if (FiltersData.isIpV4)
+            {
+                ipFromParse = ValidateIPv4(ipFromTB.Text, true);
+                ipToParse = ValidateIPv4(ipToTB.Text, false);
+            }
+            else
+            {
+                ipFromParse = ValidateIPv6(ipFromTB.Text, true);
+                ipToParse = ValidateIPv6(ipToTB.Text, false);
+            } 
+         
   
            if (ipFromParse && ipToParse)
            {
@@ -278,8 +292,40 @@ namespace RafelFinalProj
                FiltersData.ipDest = ipToTB.Text;
                return true;
            }
-           sysNotificationsLV.Items.Add(DateTime.Now.ToString("HH:mm") + ": " + ConstValues.IP_MSG_ERROR);
+           WriteNotification(ConstValues.IP_MSG_ERROR);
            return false ;
+        }
+
+        /// <summary>
+        /// Checks if the IP is a valid IPv6 address
+        /// </summary>
+        /// <param name="ipString"></param>
+        /// <param name="isSrc"></param>
+        /// <returns></returns>
+        private bool ValidateIPv6(string ipString, bool isSrc)
+        {
+            if (String.IsNullOrWhiteSpace(ipString))
+            {
+                if (isSrc)
+                {
+                    FiltersData.ipSrc = String.Empty;
+                }
+                else
+                {
+                    FiltersData.ipDest = String.Empty;
+                }
+                return true;
+            }
+
+            string[] splitValues = ipString.Split(ConstValues.IPV6_SEPERATOR);
+            if (splitValues.Length != 8)
+            {
+                return false;
+            }
+
+            ushort tempForParsing;
+            
+            return splitValues.All(r => ushort.TryParse(r, out tempForParsing));
         }
 
         /// <summary>
@@ -332,7 +378,7 @@ namespace RafelFinalProj
         }
 
         /// <summary>
-        /// Checks if the IP is a valid IP address
+        /// Checks if the IP is a valid IPv4 address
         /// </summary>
         /// <param name="ipString">The ip address</param>
         /// <returns></returns>
@@ -368,9 +414,20 @@ namespace RafelFinalProj
         /// <returns></returns>
         public bool IsValidIpRange()
         {
-            //each element in the array will contain a number between 0-255
-            string[] splitIpTo = ipToTB.Text.Split(ConstValues.IPV4_SEPERATOR);
-            string[] splitIpFrom = ipFromTB.Text.Split(ConstValues.IPV4_SEPERATOR);
+            //each element in the array will contain a number in either 0-255 or 0-65535
+            string[] splitIpTo;
+            string[] splitIpFrom;
+
+            if(FiltersData.isIpV4)
+            {
+                splitIpTo = ipToTB.Text.Split(ConstValues.IPV4_SEPERATOR);
+                splitIpFrom = ipFromTB.Text.Split(ConstValues.IPV4_SEPERATOR);
+            }
+            else
+            {
+                splitIpTo = ipToTB.Text.Split(ConstValues.IPV6_SEPERATOR);
+                splitIpFrom = ipFromTB.Text.Split(ConstValues.IPV6_SEPERATOR);
+            }
 
             for(int i =0; i < splitIpTo.Length; i++)
             {
