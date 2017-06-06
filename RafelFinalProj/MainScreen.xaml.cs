@@ -333,11 +333,11 @@ namespace RafelFinalProj
         /// </summary>
         private void Protocol()
         {         
-            if (udpRB.IsChecked.Value)
+            if (udpRB.IsChecked.Value && !tcpRB.IsChecked.Value)
             {
                 FiltersData.protocol = ConstValues.UDP_STR;
             }
-            else if (tcpRB.IsChecked.Value)
+            else if (tcpRB.IsChecked.Value && !udpRB.IsChecked.Value)
             {
                 FiltersData.protocol = ConstValues.TCP_STR;
             }

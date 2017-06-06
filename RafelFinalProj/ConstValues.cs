@@ -44,6 +44,8 @@ namespace RafelFinalProj
         public const string SCANNING_WIRESHARK_FILE = "Scanning Wireshark file";
         public const string SCANNING_WIRESHARK_COMPLETED = "Wireshark scan completed";
         public const string WIRESHARK_PARSE_ERROR = "Wireshark parse error: ";
+        public const string BAD_PACKET = "Scan error - Unkown packet protocol. packet number: ";
+
 
         //***ini Messages***
         public const string INVALID_SAVE_LOCATION_INI = "Invalid save path for ini";

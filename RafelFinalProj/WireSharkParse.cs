@@ -274,70 +274,77 @@ namespace RafelFinalProj
         /// </summary>
         private void OnPacketArrival(object sender, CaptureEventArgs e)
         {
-            //checks if the scan was cancelled
-            if (this.worker.CancellationPending)
+            try
             {
-                workerEvent.Cancel = true;
-                return;
-            }
-
-            currentPacket++;
-            if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet)
-            {
-                var packet = PacketDotNet.Packet.ParsePacket(e.Packet.LinkLayerType, e.Packet.Data);
-                var ethernetPacket = (PacketDotNet.EthernetPacket)packet;
-                int loopCounter = 0;
-                int packetSize = ethernetPacket.PayloadPacket.PayloadPacket.PayloadData.Length;
-                int fieldSize = 0;
-                byte[] packetData = ethernetPacket.PayloadPacket.PayloadPacket.PayloadData;
-                byte[] currentField;
-                int tempIndex = 0;
-                long timeDelta;
-                double ticks;
-
-                //checks the size filter
-                if (FiltersData.packetSizeFrom != -1 && FiltersData.packetSizeTo != -1)
+                //checks if the scan was cancelled
+                if (this.worker.CancellationPending)
                 {
-                    if(packetSize < FiltersData.packetSizeFrom || packetSize > FiltersData.packetSizeTo)
-                    {
-                        return;
-                    }
+                    workerEvent.Cancel = true;
+                    return;
                 }
 
-                //copies the current data according to the field's size
-                for (int i = FiltersData.offset; i < packetSize; i += fieldSize)
+                currentPacket++;
+                if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet)
                 {
-                    //checks if there are any other fields to scan
-                    if (loopCounter > fieldsList.Count - 1)
+                    var packet = PacketDotNet.Packet.ParsePacket(e.Packet.LinkLayerType, e.Packet.Data);
+                    var ethernetPacket = (PacketDotNet.EthernetPacket)packet;
+                    int loopCounter = 0;
+                    int packetSize = ethernetPacket.PayloadPacket.PayloadPacket.PayloadData.Length;
+                    int fieldSize = 0;
+                    byte[] packetData = ethernetPacket.PayloadPacket.PayloadPacket.PayloadData;
+                    byte[] currentField;
+                    int tempIndex = 0;
+                    long timeDelta;
+                    double ticks;
+
+                    //checks the size filter
+                    if (FiltersData.packetSizeFrom != -1 && FiltersData.packetSizeTo != -1)
                     {
-                        break;
+                        if (packetSize < FiltersData.packetSizeFrom || packetSize > FiltersData.packetSizeTo)
+                        {
+                            return;
+                        }
                     }
 
-                    fieldSize = fieldsList[loopCounter].size;
-                    currentField = new byte[fieldSize];
-                    tempIndex = 0;
-
-                    if ((i + fieldSize) < packetData.Length)
+                    //copies the current data according to the field's size
+                    for (int i = FiltersData.offset; i < packetSize; i += fieldSize)
                     {
-                        for (int j = i; j < (i + fieldSize); j++)
+                        //checks if there are any other fields to scan
+                        if (loopCounter > fieldsList.Count - 1)
                         {
-                            currentField[tempIndex] = packetData[j];
-                            tempIndex++;
+                            break;
                         }
 
-                        timeDelta = e.Packet.Timeval.Date.Ticks - firstPacketTime;
-                        ticks = TimeSpan.FromTicks(timeDelta).TotalSeconds;
-                        ConvertBytesToNumber(currentField, fieldsList[loopCounter].type, fieldsList[loopCounter].fieldName, ticks.ToString());
-                        
-                    }
-                    else
-                    {
-                        break;
-                    }
+                        fieldSize = fieldsList[loopCounter].size;
+                        currentField = new byte[fieldSize];
+                        tempIndex = 0;
 
-                    loopCounter++;
-                    mainScreen.ProgressBarReportProgress(currentPacket, numOfPackets);
-                }           
+                        if ((i + fieldSize) < packetData.Length)
+                        {
+                            for (int j = i; j < (i + fieldSize); j++)
+                            {
+                                currentField[tempIndex] = packetData[j];
+                                tempIndex++;
+                            }
+
+                            timeDelta = e.Packet.Timeval.Date.Ticks - firstPacketTime;
+                            ticks = TimeSpan.FromTicks(timeDelta).TotalSeconds;
+                            ConvertBytesToNumber(currentField, fieldsList[loopCounter].type, fieldsList[loopCounter].fieldName, ticks.ToString());
+
+                        }
+                        else
+                        {
+                            break;
+                        }
+
+                        loopCounter++;
+                        mainScreen.ProgressBarReportProgress(currentPacket, numOfPackets);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                mainScreen.WriteNotification(ConstValues.BAD_PACKET + currentPacket.ToString());
             }
         }
 
