@@ -26,12 +26,12 @@ namespace RafelFinalProj
         }
 
         /// <summary>
-        /// Returns the fields list
+        /// Returns the fields list. will return null if there's an error with the XML or it's empty
         /// </summary>
         /// <returns></returns>
         public List<FieldStructure> GetFieldsList()
         {
-            if(ParseXml())
+            if(ParseXml() && fieldsList.Count > 0)
             {
                 return fieldsList;
             }

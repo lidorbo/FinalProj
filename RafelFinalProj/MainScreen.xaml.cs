@@ -165,7 +165,6 @@ namespace RafelFinalProj
         {
 
            Protocol();
-           IpType();
            EndianType();
            
             //checks if every field is valid
@@ -191,16 +190,16 @@ namespace RafelFinalProj
                 Settings.Default.iniFile = iniSaveTB.Text;
                 Settings.Default.logFile = logSaveTB.Text;
                 Settings.Default.Save();
-                WriteNotification(ConstValues.SCAN_MSG);
                 List<FieldStructure> fieldStructure = xmlParser.GetFieldsList();
-                LogWriter lw = new LogWriter(logSaveTB.Text, this, xmlLoadTB.Text, wiresharkLogTB.Text);
                 if (fieldStructure != null)
                 {
+                    WriteNotification(ConstValues.SCAN_MSG);
+                    LogWriter lw = new LogWriter(logSaveTB.Text, this, xmlLoadTB.Text, wiresharkLogTB.Text);
                     wp = new WireSharkParse(iniSaveTB.Text, wiresharkLogTB.Text, fieldStructure, this, lw);
                 }
                 else
                 { 
-                   WriteNotification(ConstValues.SCAN_MSG_ERROR);
+                   WriteNotification(ConstValues.XML_ERROR);
                 }
            }
            else
@@ -218,6 +217,19 @@ namespace RafelFinalProj
         {
             this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
                 new Action(() => this.sysNotificationsLV.Items.Add(DateTime.Now.ToString(ConstValues.TIME_FORMAT) + " : " + str)));
+           
+            this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                new Action(() => AutoScrollDown()));
+        }
+
+        public void AutoScrollDown()
+        {
+            if (VisualTreeHelper.GetChildrenCount(sysNotificationsLV) > 0)
+            {
+                Border border = (Border)VisualTreeHelper.GetChild(sysNotificationsLV, 0);
+                ScrollViewer scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
+                scrollViewer.ScrollToBottom();
+            }
         }
 
      
@@ -262,18 +274,10 @@ namespace RafelFinalProj
 
             bool ipFromParse;
             bool ipToParse;
-            if (FiltersData.isIpV4)
-            {
-                ipFromParse = ValidateIPv4(ipFromTB.Text, true);
-                ipToParse = ValidateIPv4(ipToTB.Text, false);
-            }
-            else
-            {
-                ipFromParse = ValidateIPv6(ipFromTB.Text, true);
-                ipToParse = ValidateIPv6(ipToTB.Text, false);
-            } 
-         
-  
+            
+           ipFromParse = ValidateIPv4(ipFromTB.Text, true);
+           ipToParse = ValidateIPv4(ipToTB.Text, false);
+            
            if (ipFromParse && ipToParse)
            {
                FiltersData.ipSrc = ipFromTB.Text;
@@ -297,38 +301,6 @@ namespace RafelFinalProj
         }
 
         /// <summary>
-        /// Checks if the IP is a valid IPv6 address
-        /// </summary>
-        /// <param name="ipString"></param>
-        /// <param name="isSrc"></param>
-        /// <returns></returns>
-        private bool ValidateIPv6(string ipString, bool isSrc)
-        {
-            if (String.IsNullOrWhiteSpace(ipString))
-            {
-                if (isSrc)
-                {
-                    FiltersData.ipSrc = String.Empty;
-                }
-                else
-                {
-                    FiltersData.ipDest = String.Empty;
-                }
-                return true;
-            }
-
-            string[] splitValues = ipString.Split(ConstValues.IPV6_SEPERATOR);
-            if (splitValues.Length != 8)
-            {
-                return false;
-            }
-
-            ushort tempForParsing;
-            
-            return splitValues.All(r => ushort.TryParse(r, out tempForParsing));
-        }
-
-        /// <summary>
         /// Will set the protocol filter to udp, tcp or both.
         /// </summary>
         private void Protocol()
@@ -347,21 +319,7 @@ namespace RafelFinalProj
             }
         }
 
-        /// <summary>
-        /// Will set the IP type filter to IPv4 or IPv6.
-        /// </summary>
-        private void IpType()
-        {
-            if (ipv4RB.IsChecked.Value)
-            {
-                FiltersData.isIpV4 = true;
-            }
-            else
-            {
-                FiltersData.isIpV4 = false;
-            }
-        }
-
+       
         /// <summary>
         /// Will set the Endian type fitler to little or big.
         /// </summary>
@@ -418,16 +376,8 @@ namespace RafelFinalProj
             string[] splitIpTo;
             string[] splitIpFrom;
 
-            if(FiltersData.isIpV4)
-            {
-                splitIpTo = ipToTB.Text.Split(ConstValues.IPV4_SEPERATOR);
-                splitIpFrom = ipFromTB.Text.Split(ConstValues.IPV4_SEPERATOR);
-            }
-            else
-            {
-                splitIpTo = ipToTB.Text.Split(ConstValues.IPV6_SEPERATOR);
-                splitIpFrom = ipFromTB.Text.Split(ConstValues.IPV6_SEPERATOR);
-            }
+            splitIpTo = ipToTB.Text.Split(ConstValues.IPV4_SEPERATOR);
+            splitIpFrom = ipFromTB.Text.Split(ConstValues.IPV4_SEPERATOR);       
 
             for(int i =0; i < splitIpTo.Length; i++)
             {

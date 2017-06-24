@@ -56,8 +56,8 @@ namespace RafelFinalProj
                 string title = "Scan Date - " + DateTime.Today.ToString(ConstValues.DATE_FORMAT) + Environment.NewLine 
                              + "Scan Time - " + DateTime.Now.ToString(ConstValues.TIME_FORMAT) + Environment.NewLine
                              + "Xml File Name - " + xmlFileName + Environment.NewLine
-                             + "WireShark File Name - " + wireSharkFile + Environment.NewLine + Environment.NewLine 
-                             + Environment.NewLine;
+                             + "WireShark File Name - " + wireSharkFile + Environment.NewLine + Environment.NewLine;
+
                 WriteToLog(title);
             }
 

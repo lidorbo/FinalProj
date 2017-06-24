@@ -40,12 +40,13 @@ namespace RafelFinalProj
         #region System messages
         //***Wireshark Messages***
         public const string WIRESHARK_LOADED = "Wireshark file loaded";
-        public const string WIRESHARK_ERROR = "Wireshark file can't be loaded";
+        public const string WIRESHARK_ERROR = "Error - Wireshark file can't be loaded";
         public const string SCANNING_WIRESHARK_FILE = "Scanning Wireshark file";
         public const string SCANNING_WIRESHARK_COMPLETED = "Wireshark scan completed";
         public const string WIRESHARK_PARSE_ERROR = "Wireshark parse error: ";
         public const string BAD_PACKET = "Scan error - Unkown packet protocol. packet number: ";
-
+        public const string NO_RESULTS = "Scan ended with no results";
+        public const string BIGGER_THAN_XML = "This packet is bigger than the XML fields: ";
 
         //***ini Messages***
         public const string INVALID_SAVE_LOCATION_INI = "Invalid save path for ini";
@@ -58,12 +59,12 @@ namespace RafelFinalProj
         public const string LOG_CREATED = "Log file have been created";
 
         //***Fiters Messages***
-        public const string IP_MSG_ERROR = "One or more IPs are not valid";
-        public const string PORT_MSG_ERROR = "Port is not valid";
-        public const string PORT_RANGE_MSG_ERROR = "Port range is not valid";
-        public const string PACKET_MSG_ERROR = "One or packet sizes are not valid";
-        public const string PACKET_SIZE_RANGE_ERROR = "Packet size range is not valid";
-        public const string OFFSET_MSG_ERROR = "Offset must be bigger than 0";
+        public const string IP_MSG_ERROR = "Error - One or more IPs are not valid";
+        public const string PORT_MSG_ERROR = "Error - Port is not valid";
+        public const string PORT_RANGE_MSG_ERROR = "Error - Port range is not valid";
+        public const string PACKET_MSG_ERROR = "Error - One or packet sizes are not valid";
+        public const string PACKET_SIZE_RANGE_ERROR = "Error - Packet size range is not valid";
+        public const string OFFSET_MSG_ERROR = "Error - Offset must be bigger than 0";
 
 
         //***XML Messages***
@@ -72,6 +73,7 @@ namespace RafelFinalProj
         public const string XML_INVALID_TYPE_ERROR = "XML Error - Invalid type: ";
         public const string XML_NUMBER_AND_S_ERROR = "XML Error - The following field should have a number and S at the end: ";
         public const string XML_INVALID_FIELD_NAME_ERROR = "XML Error - The following field name is invalid: ";
+        public const string XML_ERROR = "Error - The XML file is either empty or corrupt.";
 
         //***General Messages***
         public const string SCAN_MSG = "Scan have started";

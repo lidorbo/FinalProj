@@ -29,6 +29,7 @@ namespace RafelFinalProj
         LogWriter logWriter;
         public BackgroundWorker worker { set; get; }
         DoWorkEventArgs workerEvent;
+        private int xmlFieldsSize = 0;
 
         public WireSharkParse(string iniPath, string wireSharkPath, List<FieldStructure> fieldsList, MainScreen mainScreen, LogWriter logWriter)
         {
@@ -61,6 +62,7 @@ namespace RafelFinalProj
                 List<string> str = new List<string>();
                 str.Add(f.type);
                 scanResults.Add(f.fieldName, str);
+                xmlFieldsSize += f.size;
             }
         }
 
@@ -160,10 +162,11 @@ namespace RafelFinalProj
         /// </summary>
         public void WriteToFiles()
         {
-            string[] temp;
+            string[] temp = {String.Empty, String.Empty};
             int totalNumOfValues = 0;
-            CreateIniFile();
+            int numOfEntries = scanResults[fieldsList[0].fieldName].Count;
 
+            CreateIniFile();
             mainScreen.WriteNotification(ConstValues.WRITING_TO_FILES);
 
             //resets the progress bar
@@ -176,32 +179,24 @@ namespace RafelFinalProj
 
             numOfPackets = (ulong)totalNumOfValues;
             totalNumOfValues = 0;
+            WriteToIniFile("[Sum Of Packets]" + Environment.NewLine + (numOfEntries - 1) + Environment.NewLine + Environment.NewLine);
+            logWriter.WriteToLog("Time tags of packets:" + Environment.NewLine);
 
-            foreach (var packet in scanResults)
+            int numOfFields = scanResults.Count;
+
+            for (int i = 1; i < numOfEntries; i++)
             {
-                WriteToIniFile("//" + packet.Value[0] + Environment.NewLine);
-                WriteToIniFile("[" + packet.Key + "]" + Environment.NewLine);
-                logWriter.WriteToLog("[" + packet.Key + "]" + Environment.NewLine);
-
-                for (int i = 0; i < packet.Value.Count; i++)
+                totalNumOfValues++;
+                for (int j = 0; j < numOfFields; j++)
                 {
-                    totalNumOfValues++;
-                    if(i == 0)
-                    {
-                        WriteToIniFile("Number of entries - " + (packet.Value.Count - 1) + Environment.NewLine);
-                    }
-                    else
-                    {
-                        temp = packet.Value[i].Split(ConstValues.VALUE_TIMETAG_SEPERATOR);
-                        WriteToIniFile(temp[0] + Environment.NewLine);
-                        logWriter.WriteToLog(temp[1] + Environment.NewLine);
-                    }
-
-                    mainScreen.ProgressBarReportProgress(totalNumOfValues, numOfPackets);
+                    //temp[0] = value of the entry, temp[1] = time tag of the packet
+                    temp = scanResults[fieldsList[j].fieldName][i].Split(ConstValues.VALUE_TIMETAG_SEPERATOR);
+                    WriteToIniFile("[" + fieldsList[j].fieldName + "_" + i + "]" + Environment.NewLine + temp[0] + Environment.NewLine);
                 }
 
-                WriteToIniFile(Environment.NewLine + Environment.NewLine);
-                logWriter.WriteToLog(Environment.NewLine + Environment.NewLine);
+                WriteToIniFile(Environment.NewLine);
+                logWriter.WriteToLog(temp[1] + Environment.NewLine);
+                mainScreen.ProgressBarReportProgress(totalNumOfValues, numOfPackets);
             }
 
             logWriter.Finish();
@@ -219,7 +214,6 @@ namespace RafelFinalProj
         {
             byte[] data = Encoding.Unicode.GetBytes(str);
             iniFile.Write(data, 0, data.Length);
-
         }
 
         /// <summary>
@@ -229,6 +223,7 @@ namespace RafelFinalProj
         /// <param name="e"></param>
         public void ParseWireShark(object senderProgress, DoWorkEventArgs e)
         {
+            bool gotResults = false;
             ICaptureDevice wireSharkFile;
             this.senderProgress = senderProgress;
             try
@@ -245,7 +240,28 @@ namespace RafelFinalProj
                 wireSharkFile.Capture();
                 mainScreen.WriteNotification(ConstValues.SCANNING_WIRESHARK_COMPLETED);
                 wireSharkFile.Close();
-                WriteToFiles();
+
+                //checks if there are results in the scan
+                foreach (var field in scanResults)
+                {
+                    if(field.Value.Count > 1)
+                    {
+                        gotResults = true;
+                        break;
+                    }
+                }
+
+                if (gotResults)
+                {
+                    WriteToFiles();
+                }
+                else
+                {
+                    mainScreen.WriteNotification(ConstValues.NO_RESULTS);
+                    logWriter.WriteToLog(ConstValues.NO_RESULTS);
+                    logWriter.Finish();
+                }
+              
                 mainScreen.HideProgressBar();
 
             }
@@ -296,6 +312,14 @@ namespace RafelFinalProj
                     int tempIndex = 0;
                     long timeDelta;
                     double ticks;
+                    timeDelta = e.Packet.Timeval.Date.Ticks - firstPacketTime;
+                    ticks = TimeSpan.FromTicks(timeDelta).TotalSeconds;
+
+                    //checks if the packet is smaller than the minimum size
+                    if (packetSize < xmlFieldsSize)
+                    {
+                        return;
+                    }
 
                     //checks the size filter
                     if (FiltersData.packetSizeFrom != -1 && FiltersData.packetSizeTo != -1)
@@ -304,6 +328,13 @@ namespace RafelFinalProj
                         {
                             return;
                         }
+                    }
+
+
+                    //checks if the the size of the packet is bigger than the XML total size
+                    if (packetSize > xmlFieldsSize)
+                    {
+                        mainScreen.WriteNotification(ConstValues.BIGGER_THAN_XML + ticks);
                     }
 
                     //copies the current data according to the field's size
@@ -319,18 +350,15 @@ namespace RafelFinalProj
                         currentField = new byte[fieldSize];
                         tempIndex = 0;
 
-                        if ((i + fieldSize) < packetData.Length)
+                        if ((i + fieldSize) <= packetData.Length)
                         {
                             for (int j = i; j < (i + fieldSize); j++)
                             {
                                 currentField[tempIndex] = packetData[j];
                                 tempIndex++;
                             }
-
-                            timeDelta = e.Packet.Timeval.Date.Ticks - firstPacketTime;
-                            ticks = TimeSpan.FromTicks(timeDelta).TotalSeconds;
+                     
                             ConvertBytesToNumber(currentField, fieldsList[loopCounter].type, fieldsList[loopCounter].fieldName, ticks.ToString());
-
                         }
                         else
                         {
@@ -344,7 +372,7 @@ namespace RafelFinalProj
             }
             catch (Exception ex)
             {
-                mainScreen.WriteNotification(ConstValues.BAD_PACKET + currentPacket.ToString());
+                mainScreen.WriteNotification(ConstValues.BAD_PACKET + currentPacket.ToString() + ex.Message);
             }
         }
 
@@ -368,7 +396,8 @@ namespace RafelFinalProj
             switch(type)
             {
                 case ConstValues.CHAR:
-                    value = data[0].ToString();
+                    sbyte[] signed = data.Select(b => (sbyte)b).ToArray();
+                    value = signed[0].ToString();
                     break;
                 case ConstValues.INT32:
                    value = BitConverter.ToInt32(data, 0).ToString();
@@ -380,7 +409,7 @@ namespace RafelFinalProj
                     value = BitConverter.ToInt16(data, 0).ToString();
                     break;
                 case ConstValues.UCHAR:
-                    value = Convert.ToChar(data).ToString();
+                    value = data[0].ToString();
                     break;
                 case ConstValues.UINT32:
                     value = BitConverter.ToUInt32(data, 0).ToString();
@@ -398,7 +427,7 @@ namespace RafelFinalProj
         }
 
         /// <summary>
-        /// Sets the filters to the scan in pcap format
+        /// Sets the filters for the scan in pcap format
         /// </summary>
         /// <returns></returns>
         public string BuildFilterString()

@@ -10,7 +10,6 @@ namespace RafelFinalProj
     {
         public static string ipDest { get; set; }
         public static string ipSrc { get; set; }
-        public static bool isIpV4 { get; set; }
         public static string protocol { get; set; }
         public static int packetSizeFrom { get; set; }
         public static int packetSizeTo { get; set; }

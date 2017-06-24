@@ -151,24 +151,14 @@
                     <Grid Grid.Row="4" Grid.Column="2">
                         <CheckBox x:Name="udpRB" Content="UDP" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press"/>
                     </Grid>
-                    <!--IP RBs-->
-                    <Grid Grid.Row="5" Grid.Column="0">
-                        <TextBlock Margin="3,5" Text="IP Version:" TextAlignment="Left" FontWeight="Bold"></TextBlock>
-                    </Grid>
-                    <Grid Grid.Row="5" Grid.Column="1">
-                        <RadioButton x:Name="ipv4RB" GroupName="ipVersion" Content="IPv4" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press" IsChecked="True"/>
-                    </Grid>
-                    <Grid Grid.Row="5" Grid.Column="2">
-                        <RadioButton x:Name="ipv6RB" GroupName="ipVersion" Content="IPv6" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press"/>
-                    </Grid>
                     <!--Endian format-->
-                    <Grid Grid.Row="6" Grid.Column="0">
+                    <Grid Grid.Row="5" Grid.Column="0">
                         <TextBlock Margin="3,5" Text="Endian Format:" TextAlignment="Left" FontWeight="Bold"></TextBlock>
                     </Grid>
-                    <Grid Grid.Row="6" Grid.Column="1">
+                    <Grid Grid.Row="5" Grid.Column="1">
                         <RadioButton x:Name="littleRB" GroupName="endian" Content="Little Endian" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press"/>
                     </Grid>
-                    <Grid Grid.Row="6" Grid.Column="2">
+                    <Grid Grid.Row="5" Grid.Column="2">
                         <RadioButton x:Name="bigRB" GroupName="endian" Content="Big Endian" VerticalAlignment="Center" HorizontalAlignment="Left" ClickMode="Press" IsChecked="True"/>
                     </Grid>
                 </Grid>
