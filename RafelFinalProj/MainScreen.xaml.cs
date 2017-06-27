@@ -98,7 +98,9 @@ namespace RafelFinalProj
                 catch (XmlException exception)
                 {
                    statusMsg = exception.Message;
+                   xmlLoadTB.Text = String.Empty;
                 }
+
                 WriteNotification(statusMsg);
             }
             else
