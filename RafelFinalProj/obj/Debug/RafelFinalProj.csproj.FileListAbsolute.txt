@@ -108,3 +108,4 @@ C:\Users\Nir\Source\Repos\FinalProj\RafelFinalProj\obj\Debug\MainScreen.baml
 C:\Users\Nir\Source\Repos\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.g.resources
 C:\Users\Nir\Source\Repos\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.Properties.Resources.resources
 C:\Users\Nir\Source\Repos\FinalProj\RafelFinalProj\obj\Debug\RafelFinalProj.csproj.GenerateResource.Cache
+C:\Users\Nir\Source\Repos\FinalProj\RafelFinalProj\bin\Debug\SharpPcap.dll.config

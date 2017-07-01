@@ -109,7 +109,7 @@
                         <TextBox Name="portToTB" BorderBrush="{StaticResource brushWatermarkBorder}" Style="{DynamicResource RoundedTextbox}" />
                     </Grid>
                     <!--Packet Size From TB-->
-                    <Label Grid.Row="1" Grid.Column="0" Content="Packet Size Range:" HorizontalAlignment="Left" FontWeight="Bold"></Label>
+                    <Label Grid.Row="1" Grid.Column="0" Content="Packet Size Range(Bytes):" HorizontalAlignment="Left" FontWeight="Bold"></Label>
                     <Grid Grid.Row="1" Grid.Column="1" Margin="5" Background="{StaticResource brushWatermarkBackground}" Style="{StaticResource EntryFieldStyle}" >
                         <TextBlock Margin="5,2" Text="Packet Size From" Foreground="{StaticResource brushWatermarkForeground}" 
                        Visibility="{Binding ElementName=packetSizeFromTB, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />

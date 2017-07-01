@@ -143,14 +143,12 @@ namespace RafelFinalProj
             sizeOfTypes.Add(ConstValues.SHORT, 2);
             sizeOfTypes.Add(ConstValues.INT32, 4);
             sizeOfTypes.Add(ConstValues.INT64, 8);
-            sizeOfTypes.Add(ConstValues.LONG, 16);
 
             //Unsigned
             sizeOfTypes.Add(ConstValues.UCHAR, 1);
             sizeOfTypes.Add(ConstValues.USHORT, 2);
             sizeOfTypes.Add(ConstValues.UINT32, 4);
             sizeOfTypes.Add(ConstValues.UINT64, 8);
-            sizeOfTypes.Add(ConstValues.ULONG, 16);
         }
 
         /// <summary>

@@ -420,6 +420,7 @@ namespace RafelFinalProj
                 case ConstValues.USHORT:
                    value = BitConverter.ToUInt16(data, 0).ToString();
                     break;
+                    
             }
 
            scanResults[fieldName].Add(value + ConstValues.VALUE_TIMETAG_SEPERATOR + timeTag);
