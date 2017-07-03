@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.Linq;
 using RafelFinalProj.Properties;
+using System.ComponentModel;
 
 namespace RafelFinalProj
 {
@@ -27,8 +28,9 @@ namespace RafelFinalProj
     {
 
         private XmlParser xmlParser;
-        XmlDocument xmlFile;
-        WireSharkParse wp;
+        private XmlDocument xmlFile;
+        private WireSharkParse wp;
+        private BindingList<string> allNotifications;
 
         public MainScreen()
         {
@@ -47,7 +49,14 @@ namespace RafelFinalProj
             }
             iniSaveTB.Text = Settings.Default.iniFile;
             logSaveTB.Text = Settings.Default.logFile;
+        
+            allNotifications = new BindingList<string>();
+            allNotifications.AllowEdit = true;
+            allNotifications.AllowNew = true;
+            allNotifications.AllowRemove = true;
+            allNotifications.RaiseListChangedEvents = false;
         }
+
         /// <summary>
         /// Loads the Wireshark file
         /// </summary>
@@ -70,7 +79,6 @@ namespace RafelFinalProj
             }
 
         }
-
 
         /// <summary>
         /// The method will load and parse the XML file.
@@ -155,7 +163,9 @@ namespace RafelFinalProj
         /// <param name="e"></param>
         private void clearNotificationsBTN_Click(object sender, RoutedEventArgs e)
         {
-            sysNotificationsLV.Items.Clear();
+            allNotifications.Clear();
+            allNotifications.RaiseListChangedEvents = true;
+            allNotifications.ResetBindings();
         }
 
         /// <summary>
@@ -217,11 +227,38 @@ namespace RafelFinalProj
         /// <param name="str">The string to write</param>
         public void WriteNotification(string str)
         {
-            this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                new Action(() => this.sysNotificationsLV.Items.Add(DateTime.Now.ToString(ConstValues.TIME_FORMAT) + " : " + str)));
+  
+            this.sysNotificationsLV.Dispatcher.Invoke(new Action(() =>
+            {
+                allNotifications.Add(DateTime.Now.ToString(ConstValues.TIME_FORMAT) + " : " + str);
+                // set the list as items source
+                this.sysNotificationsLV.ItemsSource = allNotifications;
+                // after all.. update the UI with following
+                allNotifications.RaiseListChangedEvents = true;
+                allNotifications.ResetBindings(); // this forces update of entire list    
+                AutoScrollDown();
+
+            }));
+
            
-            this.sysNotificationsLV.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                new Action(() => AutoScrollDown()));
+        }
+
+        public void WriteNotification(BindingList<string> list)
+        {
+
+            this.sysNotificationsLV.Dispatcher.Invoke(new Action(() =>
+            {
+                foreach (var str in list)
+                {
+                    allNotifications.Add(DateTime.Now.ToString(ConstValues.TIME_FORMAT) + " : " + str); 
+                }
+                this.sysNotificationsLV.ItemsSource = allNotifications;
+                allNotifications.RaiseListChangedEvents = true;
+                allNotifications.ResetBindings();
+                AutoScrollDown();
+
+            }));
+
         }
 
         public void AutoScrollDown()
@@ -412,7 +449,7 @@ namespace RafelFinalProj
                 int portTo = int.Parse(portToTB.Text);
                 if (IsRangeValid(portFrom, portTo))
                 {
-                    if ((portFrom < ConstValues.MAX_PORT) && (portTo < ConstValues.MAX_PORT) && (portFrom > 0) && (portTo > 0))
+                    if ((portFrom <= ConstValues.MAX_PORT) && (portTo <= ConstValues.MAX_PORT) && (portFrom > 0) && (portTo > 0))
                     {
                         FiltersData.portFrom = ushort.Parse(portFromTB.Text);
                         FiltersData.portTo = ushort.Parse(portToTB.Text);
@@ -525,7 +562,6 @@ namespace RafelFinalProj
         {
             wp.worker.CancelAsync();
         }
-
 
     }
 }

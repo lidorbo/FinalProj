@@ -78,7 +78,7 @@
             </StackPanel>
         </GroupBox>
         <!--Filters Groupbox-->
-        <GroupBox Header="Filters" Grid.Row="1" Padding="10" Margin="10 10" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+        <GroupBox x:Name="filtersGB" Header="Filters" Grid.Row="1" Padding="10" Margin="10 10" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top">
             <StackPanel>
                 <Grid Grid.IsSharedSizeScope="True">
                     <Grid.RowDefinitions>
@@ -188,6 +188,7 @@
             </Grid.RowDefinitions>
             <Label Content="Notifications" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
         </Grid>
+
         <ListView Name="sysNotificationsLV" Background="LightGray" BorderBrush="Black" HorizontalContentAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Grid.Row="0" Height="440" Grid.Column="1" Grid.RowSpan="2" Margin="5, 20"/>
         <Button Name="clearNotificationsBTN" VerticalAlignment="Top" Grid.Row="2" Grid.Column="1" Margin="50 10" Content="Clear Notifications" Style="{DynamicResource RoundedButton}" Foreground="White" FontWeight="Bold" Click="clearNotificationsBTN_Click"/>
     </Grid>

@@ -30,6 +30,7 @@ namespace RafelFinalProj
         public BackgroundWorker worker { set; get; }
         DoWorkEventArgs workerEvent;
         private int xmlFieldsSize = 0;
+        BindingList<string> packetsBiggerThenXml;
 
         public WireSharkParse(string iniPath, string wireSharkPath, List<FieldStructure> fieldsList, MainScreen mainScreen, LogWriter logWriter)
         {
@@ -41,6 +42,7 @@ namespace RafelFinalProj
             GetFirstPacketTime();
             CalcNumberOfPackets();
             keyStr = new List<string>();
+            packetsBiggerThenXml = new BindingList<string>();
             InitScanResults();
 
             worker = new BackgroundWorker();
@@ -253,6 +255,7 @@ namespace RafelFinalProj
 
                 if (gotResults)
                 {
+                    mainScreen.WriteNotification(packetsBiggerThenXml);
                     WriteToFiles();
                 }
                 else
@@ -334,7 +337,10 @@ namespace RafelFinalProj
                     //checks if the the size of the packet is bigger than the XML total size
                     if (packetSize > xmlFieldsSize)
                     {
-                        mainScreen.WriteNotification(ConstValues.BIGGER_THAN_XML + ticks);
+
+                       packetsBiggerThenXml.Add(ConstValues.BIGGER_THAN_XML + ticks);
+                                 
+                       // mainScreen.WriteNotification(ConstValues.BIGGER_THAN_XML + ticks);
                     }
 
                     //copies the current data according to the field's size
